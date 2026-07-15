@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-sand text-ink font-sans antialiased;
+    margin: 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-serif;
+  }
+
+  /* Tabular figures for money amounts so they align and stay scannable */
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+    @apply font-semibold;
+  }
+
+  .num-lg {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+    @apply font-semibold text-2xl;
+  }
+}
+
+@layer components {
+  .card-base {
+    @apply bg-card border border-warmgray rounded-card shadow-soft;
+  }
+
+  .page-pad {
+    @apply px-5 py-6;
+  }
+
+  .label-text {
+    @apply text-xs uppercase tracking-wide text-ink/60 font-medium;
+  }
+}
+
+/* Soft fade page transition */
+.page-fade {
+  animation: fade-in 0.22s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hide number input spinners */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
