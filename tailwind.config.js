@@ -20,6 +20,7 @@ export default {
         warmgray: '#E4DCCB',
       },
       fontFamily: {
+        display: ['"Bricolage Grotesque"', 'Fraunces', 'sans-serif'],
         serif: ['Fraunces', 'Lora', 'Georgia', 'serif'],
         sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
       },
