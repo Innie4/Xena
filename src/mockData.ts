@@ -68,6 +68,12 @@ export interface Street {
   city: 'Uyo' | 'Lagos' | 'Abuja'
 }
 
+export interface UserContribution {
+  id: string
+  amount: number
+  at: string // ISO timestamp of the sweep contribution
+}
+
 export interface User {
   id: string
   name: string
@@ -77,6 +83,7 @@ export interface User {
   bankConnected: boolean
   bankName: string
   accountName: string
+  contributions?: UserContribution[]
 }
 
 export interface VoteOption {
@@ -135,6 +142,10 @@ export interface WorkerVerification {
   submittedAt: string
   status: 'pending' | 'approved' | 'rejected'
   document: string
+  city?: string
+  wallet?: string
+  payoutAmount?: number
+  joinedAt?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -160,6 +171,14 @@ export const currentUser: User = {
   bankConnected: true,
   bankName: 'Kuda Microfinance Bank',
   accountName: 'Iniobong Udofia',
+  contributions: [
+    { id: 'c-1', amount: 1500, at: '2026-01-15T09:12:00Z' },
+    { id: 'c-2', amount: 1500, at: '2026-02-16T08:40:00Z' },
+    { id: 'c-3', amount: 1500, at: '2026-03-15T10:05:00Z' },
+    { id: 'c-4', amount: 1500, at: '2026-04-15T09:30:00Z' },
+    { id: 'c-5', amount: 1500, at: '2026-05-16T08:55:00Z' },
+    { id: 'c-6', amount: 1500, at: '2026-06-15T09:20:00Z' },
+  ],
 }
 
 export const bills: Bill[] = [
@@ -413,6 +432,10 @@ export const workerQueue: WorkerVerification[] = [
     submittedAt: '2026-07-14T10:20:00',
     status: 'pending',
     document: 'Trade cert + gov ID',
+    city: 'Uyo',
+    wallet: 'WAL-2291-AK',
+    payoutAmount: 14500,
+    joinedAt: '2026-03-02T09:00:00',
   },
   {
     id: 'w-2',
@@ -422,6 +445,11 @@ export const workerQueue: WorkerVerification[] = [
     submittedAt: '2026-07-14T14:05:00',
     status: 'pending',
     document: 'Local govt recommendation',
+    city: 'Uyo',
+    // Shares a wallet with w-1 — should raise a shared_wallet flag.
+    wallet: 'WAL-2291-AK',
+    payoutAmount: 18200,
+    joinedAt: '2026-02-18T09:00:00',
   },
   {
     id: 'w-3',
@@ -431,6 +459,11 @@ export const workerQueue: WorkerVerification[] = [
     submittedAt: '2026-07-13T09:40:00',
     status: 'pending',
     document: 'Trade cert + gov ID',
+    city: 'Uyo',
+    wallet: 'WAL-7782-AK',
+    // Joined days ago with an outsized payout — should raise new_before_large_payout.
+    payoutAmount: 70000,
+    joinedAt: '2026-07-01T09:00:00',
   },
 ]
 

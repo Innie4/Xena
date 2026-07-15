@@ -2,17 +2,47 @@ import TopNav from '../components/TopNav'
 import Card from '../components/Card'
 import ChartWrapper from '../components/ChartWrapper'
 import StatusTag from '../components/StatusTag'
+import FraudQueue from '../components/FraudQueue'
 import { useFakeLoad } from '../hooks/useFakeLoad'
 import { LoadingState } from '../components/states'
+import { useApp } from '../context/AppContext'
+import { browserEngine } from '../services/prediction/engine'
+import { FraudInputWorker, WorkerPayoutRecord } from '../services/prediction/types'
 import { operatorWeekIncome, operatorStreets, routeStops, formatNaira } from '../mockData'
 
 export default function OperatorDashboard() {
   const loading = useFakeLoad(800)
+  const { workerQueue } = useApp()
 
   const totalExpected = operatorWeekIncome.reduce((s, d) => s + d.amount, 0)
   const collected = operatorStreets.reduce((s, st) => s + st.collected, 0)
   const expectedAll = operatorStreets.reduce((s, st) => s + st.expected, 0)
   const toService = routeStops.filter((r) => r.confirmed).length
+
+  const fraudWorkers: FraudInputWorker[] = workerQueue.map((w) => ({
+    id: w.id,
+    name: w.name,
+    street: w.street,
+    city: w.city ?? '',
+    wallet: w.wallet,
+    payoutAmount: w.payoutAmount,
+    joinedAt: w.joinedAt,
+  }))
+  const fraudPayouts: WorkerPayoutRecord[] = workerQueue
+    .filter((w) => w.payoutAmount)
+    .map((w) => ({
+      id: `p-${w.id}`,
+      workerId: w.id,
+      wallet: w.wallet ?? '',
+      amount: w.payoutAmount ?? 0,
+      at: w.joinedAt ?? new Date().toISOString(),
+      streetId: w.street,
+      city: w.city ?? '',
+    }))
+  const fraudFlags = browserEngine.detectFraud({
+    workers: fraudWorkers,
+    payouts: fraudPayouts,
+  })
 
   if (loading) {
     return (
@@ -137,6 +167,8 @@ export default function OperatorDashboard() {
             ))}
           </div>
         </section>
+
+        <FraudQueue flags={fraudFlags} title="Worker fraud review" />
       </div>
     </div>
   )

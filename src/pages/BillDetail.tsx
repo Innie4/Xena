@@ -6,15 +6,29 @@ import Button from '../components/Button'
 import StatusTag from '../components/StatusTag'
 import Modal, { SuccessModal } from '../components/Modal'
 import { useApp } from '../context/AppContext'
+import { browserEngine, streetRankForScore } from '../services/prediction/engine'
+import { ContributorProfile } from '../services/prediction/types'
 import { formatNaira, formatDate } from '../mockData'
-
-const FEE = 10
 
 export default function BillDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { bills, payBill, setBillSmartSweep, walletBalance } = useApp()
+  const { bills, payBill, setBillSmartSweep, walletBalance, user, activeStreetId } = useApp()
   const bill = bills.find((b) => b.id === id)
+
+  const profile: ContributorProfile = {
+    id: user?.id ?? 'me',
+    name: user?.name ?? 'You',
+    streetId: user?.streetId ?? activeStreetId,
+    events: (user?.contributions ?? []).map((c) => ({
+      id: c.id,
+      contributorId: user?.id ?? 'me',
+      amount: c.amount,
+      at: c.at,
+    })),
+  }
+  const reliability = browserEngine.scoreReliability(profile)
+  const rank = streetRankForScore(reliability.score)
 
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -31,6 +45,9 @@ export default function BillDetail() {
       </div>
     )
   }
+
+  // Processing fee follows the resident's reliability tier (AI-derived).
+  const FEE = Math.max(10, Math.round(bill.amount * reliability.tier.rate))
 
   const breakdown = [
     { label: 'Base amount', value: bill.amount - FEE },
@@ -104,6 +121,26 @@ export default function BillDetail() {
             <div className="flex justify-between font-medium">
               <span className="text-ink">Total</span>
               <span className="num text-ink">{formatNaira(bill.amount)}</span>
+            </div>
+          </div>
+          <p className="text-[11px] text-olive font-medium mt-2">
+            Your {rank.label} standing ({reliability.score}/100) earns the {reliability.tier.label} fee of{' '}
+            {(reliability.tier.rate * 100).toFixed(1)}%.
+          </p>
+        </Card>
+
+        <Card className="bg-sand border-warmgray">
+          <div className="flex items-start gap-2">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3F4B2B" strokeWidth="1.8" className="mt-0.5 shrink-0">
+              <path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z" strokeLinejoin="round" />
+              <circle cx="12" cy="10" r="2.5" />
+            </svg>
+            <div>
+              <p className="text-xs font-medium text-olive">Community guarantee</p>
+              <p className="text-[11px] text-ink/60 mt-0.5">
+                Your street’s sweep reliability keeps this fee fair. Miss a sweep and the rate eases back
+                up — stay on rhythm and it keeps dropping.
+              </p>
             </div>
           </div>
         </Card>

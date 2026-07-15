@@ -3,9 +3,12 @@ import Card from '../components/Card'
 import Table, { Column } from '../components/Table'
 import StatusTag from '../components/StatusTag'
 import Button from '../components/Button'
+import FraudQueue from '../components/FraudQueue'
 import { useFakeLoad } from '../hooks/useFakeLoad'
 import { LoadingState } from '../components/states'
 import { useApp } from '../context/AppContext'
+import { browserEngine } from '../services/prediction/engine'
+import { FraudInputWorker, WorkerPayoutRecord } from '../services/prediction/types'
 import {
   AdminStreetRow,
   HealthStatus,
@@ -27,6 +30,31 @@ export default function AdminDashboard() {
 
   const streets = adminStreets
   const pendingWorkers = workerQueue.filter((w) => w.status === 'pending')
+
+  const fraudWorkers: FraudInputWorker[] = workerQueue.map((w) => ({
+    id: w.id,
+    name: w.name,
+    street: w.street,
+    city: w.city ?? '',
+    wallet: w.wallet,
+    payoutAmount: w.payoutAmount,
+    joinedAt: w.joinedAt,
+  }))
+  const fraudPayouts: WorkerPayoutRecord[] = workerQueue
+    .filter((w) => w.payoutAmount)
+    .map((w) => ({
+      id: `p-${w.id}`,
+      workerId: w.id,
+      wallet: w.wallet ?? '',
+      amount: w.payoutAmount ?? 0,
+      at: w.joinedAt ?? new Date().toISOString(),
+      streetId: w.street,
+      city: w.city ?? '',
+    }))
+  const fraudFlags = browserEngine.detectFraud({
+    workers: fraudWorkers,
+    payouts: fraudPayouts,
+  })
 
   const columns: Column<AdminStreetRow>[] = [
     {
@@ -152,6 +180,8 @@ export default function AdminDashboard() {
             </div>
           )}
         </section>
+
+        <FraudQueue flags={fraudFlags} title="Fraud review queue" />
       </div>
     </div>
   )

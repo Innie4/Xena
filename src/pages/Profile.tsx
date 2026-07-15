@@ -3,9 +3,11 @@ import { useState } from 'react'
 import PageHeader from '../components/PageHeader'
 import Card from '../components/Card'
 import Button from '../components/Button'
+import StandingCard from '../components/StandingCard'
 import Modal, { SuccessModal } from '../components/Modal'
 import { useApp } from '../context/AppContext'
 import { formatNaira } from '../mockData'
+import { ContributorProfile } from '../services/prediction/types'
 
 export default function Profile() {
   const {
@@ -26,6 +28,18 @@ export default function Profile() {
   const activeMandates = sweepMandates.filter((m) => m.active)
   const billTypeFor = (billId: string) =>
     bills.find((b) => b.id === billId)?.type ?? 'bill'
+
+  const profile: ContributorProfile = {
+    id: user?.id ?? 'me',
+    name: user?.name ?? 'You',
+    streetId: user?.streetId ?? activeStreetId,
+    events: (user?.contributions ?? []).map((c) => ({
+      id: c.id,
+      contributorId: user?.id ?? 'me',
+      amount: c.amount,
+      at: c.at,
+    })),
+  }
 
   return (
     <div className="pb-4">
@@ -61,6 +75,8 @@ export default function Profile() {
           </div>
           <p className="text-[11px] text-ink/45 mt-2">Secured via Open Banking · read-only access</p>
         </Card>
+
+        <StandingCard profile={profile} />
 
         <section>
           <h2 className="font-serif text-lg text-ink mb-2">Your mandates</h2>

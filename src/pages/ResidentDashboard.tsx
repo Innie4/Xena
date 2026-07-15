@@ -3,9 +3,11 @@ import PageHeader from '../components/PageHeader'
 import Card from '../components/Card'
 import ProgressBar from '../components/ProgressBar'
 import StatusTag from '../components/StatusTag'
+import StandingCard from '../components/StandingCard'
 import { EmptyState } from '../components/states'
 import { useApp } from '../context/AppContext'
 import { formatNaira, formatDate } from '../mockData'
+import { ContributorProfile } from '../services/prediction/types'
 import { useFakeLoad } from '../hooks/useFakeLoad'
 
 export default function ResidentDashboard() {
@@ -16,6 +18,18 @@ export default function ResidentDashboard() {
   const streetProject = projects.find(
     (p) => p.streetId === activeStreetId && p.status === 'active',
   )
+
+  const profile: ContributorProfile = {
+    id: user?.id ?? 'me',
+    name: user?.name ?? 'You',
+    streetId: user?.streetId ?? activeStreetId,
+    events: (user?.contributions ?? []).map((c) => ({
+      id: c.id,
+      contributorId: user?.id ?? 'me',
+      amount: c.amount,
+      at: c.at,
+    })),
+  }
 
   return (
     <div className="pb-4">
@@ -43,6 +57,12 @@ export default function ResidentDashboard() {
         </Card>
 
         <div className="lg:grid lg:grid-cols-3 lg:gap-5 space-y-5 lg:space-y-0">
+          {/* Street standing — AI-derived reliability + next contribution */}
+          <div className="lg:col-span-3">
+            <StandingCard profile={profile} />
+          </div>
+
+          {/* Bills */}
           {/* Bills */}
           {loading ? (
             <div className="lg:col-span-2 card-base p-6 text-center text-ink/50 text-sm">
