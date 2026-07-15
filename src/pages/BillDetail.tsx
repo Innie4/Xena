@@ -25,7 +25,7 @@ export default function BillDetail() {
     return (
       <div>
         <PageHeader title="Bill" backTo="/bills" />
-        <div className="max-w-md mx-auto px-5 py-10 text-center text-ink/60">
+        <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-10 text-center text-ink/60">
           Bill not found.
         </div>
       </div>
@@ -53,7 +53,7 @@ export default function BillDetail() {
     <div className="pb-4">
       <PageHeader title={bill.type} subtitle={bill.provider} backTo="/bills" />
 
-      <div className="max-w-md mx-auto px-5 py-5 space-y-4">
+      <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
         <Card>
           <div className="flex items-center justify-between">
             <span className="text-sm text-ink/60">Amount due</span>

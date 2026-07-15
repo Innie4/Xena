@@ -21,7 +21,7 @@ export default function CommunityProjects() {
         backTo="/app"
       />
 
-      <div className="max-w-md mx-auto px-5 py-5 space-y-4">
+      <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
         <Card className="flex items-center justify-between">
           <div>
             <p className="font-medium text-ink">{streetProjects.filter((p) => p.status === 'active').length} active</p>

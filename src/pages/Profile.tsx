@@ -31,7 +31,7 @@ export default function Profile() {
     <div className="pb-4">
       <PageHeader title="Profile" subtitle="Your account & mandates" backTo="/app" showBell={false} />
 
-      <div className="max-w-md mx-auto px-5 py-5 space-y-4">
+      <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
         <Card>
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 rounded-full bg-terracotta text-card flex items-center justify-center font-serif text-lg font-semibold">

@@ -26,7 +26,7 @@ export default function CommunityProjectDetail() {
     return (
       <div>
         <PageHeader title="Project" backTo="/community" />
-        <div className="max-w-md mx-auto px-5 py-10 text-center text-ink/60">Project not found.</div>
+        <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-10 text-center text-ink/60">Project not found.</div>
       </div>
     )
   }
@@ -52,7 +52,7 @@ export default function CommunityProjectDetail() {
     <div className="pb-4">
       <PageHeader title="Community Wallet" subtitle={project.category} backTo="/community" />
 
-      <div className="max-w-md mx-auto px-5 py-5 space-y-4">
+      <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
         <Card>
           <div className="flex items-start justify-between gap-2">
             <h2 className="font-serif text-xl text-ink leading-snug">{project.title}</h2>

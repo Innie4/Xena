@@ -46,7 +46,7 @@ const items = [
 
 export default function BottomNav() {
   return (
-    <nav className="sticky bottom-0 z-30 bg-card/95 backdrop-blur border-t border-warmgray">
+    <nav className="sticky bottom-0 z-30 bg-card/95 backdrop-blur border-t border-warmgray lg:hidden">
       <div className="max-w-md mx-auto flex justify-around items-stretch">
         {items.map((item) => (
           <NavLink

@@ -15,7 +15,7 @@ export default function PageHeader({ title, subtitle, backTo, showBell = true }:
 
   return (
     <header className="bg-card border-b border-warmgray sticky top-0 z-20">
-      <div className="max-w-md mx-auto px-5 py-4 flex items-center justify-between">
+      <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 px-5 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           {backTo && (
             <button

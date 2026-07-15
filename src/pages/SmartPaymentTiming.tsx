@@ -28,7 +28,7 @@ export default function SmartPaymentTiming() {
     <div className="pb-4">
       <PageHeader title="Smart Payment Timing" subtitle="Collect when you’re paid" backTo="/profile" />
 
-      <div className="max-w-md mx-auto px-5 py-5 space-y-4">
+      <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
         <Card>
           <p className="label-text">Detected pay pattern</p>
           <p className="font-serif text-xl text-ink mt-1">
