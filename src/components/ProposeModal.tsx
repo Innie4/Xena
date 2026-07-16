@@ -15,6 +15,15 @@ const CATEGORIES: ProposalCategory[] = [
   'Sanitation',
 ]
 
+const COST_RANGES = [
+  { label: '₦5,000 - ₦10,000', value: 10000 },
+  { label: '₦10,000 - ₦20,000', value: 20000 },
+  { label: '₦20,000 - ₦40,000', value: 40000 },
+  { label: '₦40,000 - ₦60,000', value: 60000 },
+  { label: '₦60,000 - ₦80,000', value: 80000 },
+  { label: '₦80,000 - ₦100,000', value: 100000 },
+]
+
 export default function ProposeModal() {
   const { proposeOpen, closePropose, contacts, activeStreetId, createProposal } = useApp()
   const navigate = useNavigate()
@@ -137,15 +146,26 @@ export default function ProposeModal() {
             </div>
           </div>
 
-          <Input
-            id="pr-cost"
-            label="Estimated cost"
-            type="currency"
-            leading="₦"
-            placeholder="45,000"
-            value={cost}
-            onChange={(e) => setCost(e.target.value)}
-          />
+          <div>
+            <label htmlFor="pr-cost" className="label-text block mb-1.5">
+              Estimated cost
+            </label>
+            <select
+              id="pr-cost"
+              value={cost}
+              onChange={(e) => setCost(e.target.value)}
+              className="w-full bg-card border border-warmgray rounded-btn px-3 py-2.5 outline-none text-ink focus-within:ring-2 focus-within:ring-terracotta/40"
+            >
+              <option value="" disabled>
+                Select a range
+              </option>
+              {COST_RANGES.map((r) => (
+                <option key={r.value} value={r.value}>
+                  {r.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <p className="text-xs text-ink/50">
             Opens a 48-hour vote with the people you pick next.
