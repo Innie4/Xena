@@ -50,7 +50,7 @@ export default function Profile() {
     <div className="pb-4">
       <PageHeader title="Profile" subtitle="Your account & mandates" backTo="/app" showBell={false} />
 
-      <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
+      <div className="w-full lg:max-w-6xl lg:mx-auto lg:px-8 lg:py-7 px-5 py-5 space-y-4">
         <GameStrip />
         <section className="space-y-4">
           <h2 className="font-serif text-lg text-ink">Account</h2>

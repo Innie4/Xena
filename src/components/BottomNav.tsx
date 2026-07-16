@@ -58,7 +58,7 @@ export default function BottomNav() {
           <path d="M12 5v14M5 12h14" strokeLinecap="round" />
         </svg>
       </button>
-      <div className="max-w-md mx-auto flex justify-around items-stretch">
+      <div className="w-full flex justify-around items-stretch">
         {items.map((item) => (
           <NavLink
             key={item.to}

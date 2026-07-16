@@ -439,7 +439,7 @@ export default function SignupFlow() {
 
   return (
     <div className="min-h-screen bg-sand flex flex-col">
-      <div className="px-4 sm:px-6 pt-5 flex items-center justify-between max-w-md mx-auto w-full">
+      <div className="px-4 sm:px-6 pt-5 flex items-center justify-between w-full lg:max-w-md lg:mx-auto">
         <div className="flex items-center gap-2">
           <div className="h-9 w-9 rounded-card bg-terracotta flex items-center justify-center">
             <span className="font-serif text-card text-lg font-semibold">X</span>
@@ -450,7 +450,7 @@ export default function SignupFlow() {
       </div>
 
       {/* Gamified journey bar */}
-      <div className="px-4 sm:px-6 pt-5 max-w-md mx-auto w-full">
+      <div className="px-4 sm:px-6 pt-5 w-full lg:max-w-md lg:mx-auto">
         <Journey step={step} />
         <div className="mt-3 h-1.5 w-full bg-warmgray rounded-full overflow-hidden">
           <motion.div
@@ -461,7 +461,7 @@ export default function SignupFlow() {
         </div>
       </div>
 
-      <div className="flex-1 px-4 sm:px-6 py-7 max-w-md mx-auto w-full">
+      <div className="flex-1 px-4 sm:px-6 py-7 w-full lg:max-w-md lg:mx-auto">
         <AnimatePresence mode="wait">
           <motion.div
             key={step}

@@ -38,7 +38,7 @@ export default function SmartSweep() {
     return (
       <div>
         <PageHeader title="Smart Sweep" backTo="/bills" />
-        <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-10 text-center text-ink/60">Bill not found.</div>
+        <div className="w-full lg:max-w-6xl lg:mx-auto lg:px-8 lg:py-7 px-5 py-10 text-center text-ink/60">Bill not found.</div>
       </div>
     )
   }
@@ -47,7 +47,7 @@ export default function SmartSweep() {
     return (
       <div>
         <PageHeader title="Smart Sweep" backTo={`/bills/${billId}`} />
-        <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-10 text-center text-ink/60">
+        <div className="w-full lg:max-w-6xl lg:mx-auto lg:px-8 lg:py-7 px-5 py-10 text-center text-ink/60">
           No Smart Sweep set up for this bill.
           <div className="mt-4">
             <Link to={`/bills/${billId}`}>
@@ -83,7 +83,7 @@ export default function SmartSweep() {
     <div className="pb-4">
       <PageHeader title="Smart Sweep" subtitle={bill.type} backTo={`/bills/${billId}`} />
 
-      <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
+      <div className="w-full lg:max-w-6xl lg:mx-auto lg:px-8 lg:py-7 px-5 py-5 space-y-4">
         <GameStrip />
         <p className="text-sm text-ink/60 -mt-2">Small automatic sweeps keep your rhythm without you lifting a finger.</p>
         {/* Mandate summary: always visible per trust rules */}

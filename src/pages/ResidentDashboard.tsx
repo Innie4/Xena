@@ -36,7 +36,7 @@ export default function ResidentDashboard() {
     <div className="pb-4">
       <PageHeader title={`Welcome, ${user?.firstName ?? ''}`} subtitle={getStreetName(activeStreetId)} />
 
-      <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5">
+      <div className="w-full lg:max-w-6xl lg:mx-auto lg:px-8 lg:py-7 px-5 py-5">
         {/* Wallet summary */}
         <Card className="bg-olive text-card border-0 mb-5">
           <p className="text-xs text-card/70">Wallet balance</p>
