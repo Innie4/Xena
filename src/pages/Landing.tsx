@@ -502,7 +502,7 @@ export default function Landing() {
             </Reveal>
           </section>
 
-          {/* Marks of a street that holds: varied, not symmetric */}
+          {/* The street's marks, set down like a codex */}
           <section className="px-5 sm:px-8 py-16 max-w-5xl mx-auto">
             <Reveal>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-terracotta">
@@ -510,15 +510,20 @@ export default function Landing() {
               </p>
               <h2 className="font-serif text-3xl sm:text-4xl text-ink mt-2">Earned, not given</h2>
             </Reveal>
-            <div className="mt-9 grid sm:grid-cols-2 gap-4">
+            <div className="mt-9 border-y border-warmgray/70 divide-y divide-warmgray/70">
               {MARKS.map((m, i) => (
-                <Reveal key={m.title} delay={(i % 2) * 0.08}>
-                  <div className={`rounded-card border border-warmgray p-5 h-full ${i % 2 === 1 ? 'sm:mt-8' : ''}`}>
-                    <div className={`inline-flex h-10 w-10 rounded-xl items-center justify-center ${m.tone}`}>
+                <Reveal key={m.title} delay={(i % 4) * 0.05}>
+                  <div className="group flex items-start gap-5 py-7">
+                    <div className="shrink-0 h-12 w-12 rounded-full bg-gradient-to-br from-terracotta to-gold flex items-center justify-center text-card font-display text-lg shadow-soft">
+                      {['I', 'II', 'III', 'IV'][i]}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-serif text-xl font-semibold text-ink">{m.title}</h3>
+                      <p className="text-ink/65 mt-1.5 font-sans text-sm leading-relaxed">{m.body}</p>
+                    </div>
+                    <div className={`hidden sm:flex h-11 w-11 rounded-full items-center justify-center shrink-0 ${m.tone}`}>
                       {m.icon}
                     </div>
-                    <h3 className="font-serif text-lg font-semibold text-ink mt-3">{m.title}</h3>
-                    <p className="text-ink/65 mt-1.5 font-sans text-sm">{m.body}</p>
                   </div>
                 </Reveal>
               ))}
