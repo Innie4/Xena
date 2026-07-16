@@ -30,7 +30,7 @@ class BankAccountItem(BaseModel):
     bank_name: str
     account_number: str
     account_name: str
-    provider: str
+    provider: str = ""
 
 
 class BvnLookupResponse(BaseModel):
@@ -129,7 +129,7 @@ def bvn_lookup(body: BvnLookupRequest):
     try:
         accounts_result = (
             supabase.table("bvn_accounts")
-            .select("bank_name, account_number, account_name, provider")
+            .select("bank_name, account_number, account_name")
             .eq("bvn", digits)
             .execute()
         )
@@ -148,7 +148,7 @@ def bvn_lookup(body: BvnLookupRequest):
             bank_name=row["bank_name"],
             account_number=row["account_number"],
             account_name=row["account_name"],
-            provider=row["provider"],
+            provider="",
         )
         for row in rows
     ]
