@@ -119,7 +119,7 @@ export default function StandingCard({
           transition={{ type: 'spring', stiffness: 200, damping: 16, delay: 0.3 }}
           className="mt-2 text-[11px] text-gold font-medium"
         >
-          Top of the street — neighbours lean on you.
+          Top of the street. Neighbours lean on you.
         </motion.p>
       )}
     </Card>

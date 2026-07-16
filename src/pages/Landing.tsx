@@ -81,7 +81,7 @@ function Counter({
   )
 }
 
-/* A warm cursor glow — the world is aware of the visitor. Desktop only. */
+/* A warm cursor glow: the world is aware of the visitor. Desktop only. */
 function CursorGlow() {
   const reduce = useReducedMotion()
   const x = useMotionValue(-200)
@@ -104,7 +104,7 @@ function CursorGlow() {
   return <motion.div className="pointer-events-none fixed inset-0 z-0" style={{ background: bg }} />
 }
 
-/* A restrained drift of embers — ten that mean something, not a hundred. */
+/* A restrained drift of embers: ten that mean something, not a hundred. */
 function Embers({ count = 10 }: { count?: number }) {
   const reduce = useReducedMotion()
   const embers = useMemo(
@@ -240,7 +240,7 @@ function CommunityWalletDemo() {
           </div>
 
           <div className="flex-1">
-            <p className="text-sm text-ink/70">Drainage project</p>
+            <p className="text-sm text-ink/70">Gutter clearing fund</p>
             <p className="num text-lg text-olive mt-0.5">{formatNaira(total)}</p>
             <p className="text-xs text-ink/50">of {formatNaira(goal)}</p>
           </div>
@@ -281,7 +281,7 @@ const TURNS = [
   {
     n: 'I',
     title: 'Light the first spark',
-    body: 'One BVN unlocks your banks through Open Banking — no passwords, no typing out account details. The fire knows you.',
+    body: 'One BVN unlocks your banks through Open Banking. No passwords, no typing out account details. The fire knows you.',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
         <path d="M12 3c1 3-2 4-2 7a2 2 0 0 0 4 0c0-1-.5-2-1-3 2 1 3 3 3 5a4 4 0 1 1-8 0c0-4 4-5 4-9z" strokeLinejoin="round" />
@@ -325,7 +325,7 @@ const MARKS = [
   },
   {
     title: 'Which hearth burns brightest',
-    body: 'See which street funds fastest. Abak Road leads the table this month — and the next street is close behind.',
+    body: 'See which street funds fastest. Abak Road leads the table this month, and the next street is close behind.',
     tone: 'bg-gold/15 text-[#8a6516]',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -336,7 +336,7 @@ const MARKS = [
   },
   {
     title: 'Marks you earn',
-    body: 'First sweep, a fully-funded project, a 30-day streak — wear them on your profile like brands from the fire.',
+    body: 'First sweep, a fully-funded project, a 30-day streak. Wear them on your profile like brands from the fire.',
     tone: 'bg-olive/10 text-olive',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -347,7 +347,7 @@ const MARKS = [
   },
   {
     title: 'Every log is seen',
-    body: 'Verified workers, live progress, job start dates. Nothing vanishes into the dark — every naira on the fire is traceable.',
+    body: 'Verified workers, live progress, job start dates. Nothing vanishes into the dark. Every naira on the fire is traceable.',
     tone: 'bg-brick/10 text-brick',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -422,8 +422,8 @@ export default function Landing() {
             transition={{ duration: 0.9, ease: 'easeOut', delay: 0.28 }}
             className="mt-6 text-card/75 text-base sm:text-lg max-w-xl mx-auto font-sans"
           >
-            Xena turns the bills a street shares — trash, water, light — into small, steady sweeps, so
-            the work gets done and no one carries the dark alone.
+            Xena turns the bills a street shares, trash, water, waste pickup, into small, steady sweeps, so
+            the work gets done and no one carries the load alone.
           </motion.p>
 
           <motion.div
@@ -450,7 +450,7 @@ export default function Landing() {
           <div className="pointer-events-none absolute -top-10 right-0 h-72 w-72 rounded-full bg-gold/10 blur-3xl" />
           <div className="pointer-events-none absolute top-1/3 -left-20 h-72 w-72 rounded-full bg-terracotta/10 blur-3xl" />
 
-          {/* What the fire is — concrete, in-world */}
+          {/* What the fire is: concrete, in-world */}
           <section className="px-5 sm:px-8 pt-20 pb-16 max-w-3xl mx-auto">
             <Reveal>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-terracotta">
@@ -460,14 +460,14 @@ export default function Landing() {
             <Reveal delay={0.05}>
               <p className="font-serif text-2xl sm:text-3xl leading-snug text-ink mt-3">
                 On Abak Road, the <span className="text-terracotta">₦1,500 trash bill</span> isn’t one
-                person’s weight. It’s the street’s fire — and every neighbour feeds it{' '}
+                person’s weight. It’s the street’s fire, and every neighbour feeds it{' '}
                 <span className="text-olive">₦500 at a time</span>, without thinking.
               </p>
             </Reveal>
             <Reveal delay={0.12}>
               <p className="text-ink/70 mt-5 font-sans leading-relaxed">
                 Xena is the hearth-keeper. It links your BVN, opens your street’s Community Wallet, and
-                runs Smart Sweep — small automatic collections that land when your balance is healthy.
+                runs Smart Sweep, small automatic collections that land when your balance is healthy.
                 The money funds the projects your street votes on, and every naira is seen by everyone.
                 Stay on rhythm and your standing rises; the whole street pays less.
               </p>
@@ -487,7 +487,7 @@ export default function Landing() {
             </Reveal>
           </section>
 
-          {/* How it works — three turns, not three cards */}
+          {/* How it works: three turns, not three cards */}
           <section className="px-5 sm:px-8 py-16 max-w-4xl mx-auto">
             <Reveal>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-olive">
@@ -522,7 +522,7 @@ export default function Landing() {
             </div>
           </section>
 
-          {/* The street's ledger — plain words, not a stat grid */}
+          {/* The street's ledger: plain words, not a stat grid */}
           <section className="px-5 sm:px-8 py-16 max-w-3xl mx-auto">
             <Reveal>
               <p className="font-serif text-2xl sm:text-3xl leading-snug text-ink">
@@ -543,7 +543,7 @@ export default function Landing() {
             </Reveal>
           </section>
 
-          {/* Marks of a street that holds — varied, not symmetric */}
+          {/* Marks of a street that holds: varied, not symmetric */}
           <section className="px-5 sm:px-8 py-16 max-w-5xl mx-auto">
             <Reveal>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-terracotta">

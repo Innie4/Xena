@@ -6,7 +6,7 @@ export type BillStatus = 'paid' | 'pending' | 'in_progress' | 'overdue'
 export interface Bill {
   id: string
   residentId: string
-  type: 'Trash collection' | 'Water' | 'Electricity' | 'Street light' | 'Security'
+  type: 'Trash collection' | 'Water' | 'Electricity' | 'Waste pickup' | 'Security'
   provider: string
   amount: number
   dueDate: string // ISO date
@@ -28,7 +28,7 @@ export interface CommunityProject {
   streetId: string
   title: string
   description: string
-  category: 'Drainage' | 'Security' | 'Sanitation' | 'Lighting' | 'Road'
+  category: 'Gate pickup' | 'Gutter clearing' | 'Waste packing' | 'Security' | 'Sanitation'
   raised: number
   goal: number
   daysRemaining: number
@@ -216,8 +216,8 @@ export const bills: Bill[] = [
   {
     id: 'bill-4',
     residentId: 'u-iniobong',
-    type: 'Street light',
-    provider: 'Abak Road Association',
+    type: 'Waste pickup',
+    provider: 'Abak Road Sanitation Co.',
     amount: 800,
     dueDate: '2026-06-30',
     status: 'paid',
@@ -239,10 +239,10 @@ export const communityProjects: CommunityProject[] = [
   {
     id: 'proj-drain',
     streetId: 'st-abak',
-    title: 'Clear the Abak Road drainage',
+    title: 'Clear the Abak Road gutters',
     description:
-      'The open drainage by the market junction floods every rainy season. Funds pay a verified crew to desilt and lay new covers.',
-    category: 'Drainage',
+      'The gutters by the market junction clog every rainy season. Funds pay a verified crew to clear them and pack the waste for collection.',
+    category: 'Gutter clearing',
     raised: 98000,
     goal: 120000,
     daysRemaining: 9,
@@ -259,10 +259,10 @@ export const communityProjects: CommunityProject[] = [
   {
     id: 'proj-light',
     streetId: 'st-abak',
-    title: 'Solar street lights for Abak Road',
+    title: 'Gate waste pickup for Abak Road',
     description:
-      'Replace the three dead poles near the bus stop with solar lamps so children walk home safely at night.',
-    category: 'Lighting',
+      'A verified crew collects the waste left by each gate on Abak Road twice a week, so no bin overflows and the street stays clear.',
+    category: 'Gate pickup',
     raised: 145000,
     goal: 145000,
     daysRemaining: 0,
@@ -273,16 +273,16 @@ export const communityProjects: CommunityProject[] = [
       { name: 'Oto-obong', amount: 12000, anonymous: false },
       { name: 'Anonymous', amount: 5000, anonymous: true },
     ],
-    worker: { name: 'Nseobong Ekanem', skill: 'Solar technician' },
+    worker: { name: 'Nseobong Ekanem', skill: 'Waste crew lead' },
     jobStartDate: '2026-07-22',
   },
   {
     id: 'proj-gate',
     streetId: 'st-abak',
-    title: 'Security gate for the street entrance',
+    title: 'Waste packing point at the street entrance',
     description:
-      'Completed last quarter. A boom gate and guard post were installed and handed to the vigilante group.',
-    category: 'Security',
+      'Completed last quarter. A central packing point was set up where collectors pick up the street’s packed waste each week.',
+    category: 'Waste packing',
     raised: 230000,
     goal: 230000,
     daysRemaining: 0,
@@ -305,21 +305,21 @@ export const notifications: AppNotification[] = [
   {
     id: 'n-2',
     type: 'community',
-    message: "Your street's drain project is 90% funded",
+    message: "Your street's gutter project is 90% funded",
     timestamp: '2026-07-15T06:10:00',
     read: false,
   },
   {
     id: 'n-3',
     type: 'bill',
-    message: 'Your electricity bill is now overdue — ₦6,400 still due',
+    message: 'Your electricity bill is now overdue. ₦6,400 still due',
     timestamp: '2026-07-13T09:00:00',
     read: true,
   },
   {
     id: 'n-4',
     type: 'community',
-    message: 'Solar street lights fully funded — crew starts 22 July',
+    message: 'Gate waste pickup fully funded. Crew starts 22 July',
     timestamp: '2026-07-11T18:30:00',
     read: true,
   },
@@ -377,8 +377,8 @@ export const voteOptions: VoteOption[] = [
   {
     id: 'v-4',
     streetId: 'st-abak',
-    title: 'Backup generator for the street light',
-    description: 'Keep the new solar lights on through cloudy weeks.',
+    title: 'Second gate bin for the street',
+    description: 'Keep the gate pickup from overflowing on busy market days.',
     votes: 12,
     votedBy: [],
   },
@@ -408,8 +408,8 @@ export const routeStops: RouteStop[] = [
   { id: 'r-1', streetId: 'st-abak', streetName: 'Abak Road', confirmed: true, bins: 18, note: 'All households paid' },
   { id: 'r-2', streetId: 'st-wellington', streetName: 'Wellington Bassey Way', confirmed: true, bins: 24, note: 'All households paid' },
   { id: 'r-3', streetId: 'st-adeniran', streetName: 'Adeniran Ogunsanya', confirmed: true, bins: 40, note: 'All households paid' },
-  { id: 'r-4', streetId: 'st-oron', streetName: 'Oron Road', confirmed: false, bins: 21, note: '63% collected — service on confirmation' },
-  { id: 'r-5', streetId: 'st-ikot', streetName: 'Ikot Ekpene Road', confirmed: false, bins: 19, note: '60% collected — service on confirmation' },
+  { id: 'r-4', streetId: 'st-oron', streetName: 'Oron Road', confirmed: false, bins: 21,     note: '63% collected, service on confirmation' },
+  { id: 'r-5', streetId: 'st-ikot', streetName: 'Ikot Ekpene Road', confirmed: false, bins: 19,     note: '60% collected, service on confirmation' },
 ]
 
 // ---- Admin ----
@@ -427,7 +427,7 @@ export const workerQueue: WorkerVerification[] = [
   {
     id: 'w-1',
     name: 'Nseobong Ekanem',
-    skill: 'Solar technician',
+    skill: 'Waste crew lead',
     street: 'Abak Road',
     submittedAt: '2026-07-14T10:20:00',
     status: 'pending',
@@ -440,13 +440,13 @@ export const workerQueue: WorkerVerification[] = [
   {
     id: 'w-2',
     name: 'Effiong Bassey',
-    skill: 'Drainage crew lead',
+    skill: 'Gutter clearing lead',
     street: 'Oron Road',
     submittedAt: '2026-07-14T14:05:00',
     status: 'pending',
     document: 'Local govt recommendation',
     city: 'Uyo',
-    // Shares a wallet with w-1 — should raise a shared_wallet flag.
+    // Shares a wallet with w-1: should raise a shared_wallet flag.
     wallet: 'WAL-2291-AK',
     payoutAmount: 18200,
     joinedAt: '2026-02-18T09:00:00',
@@ -461,7 +461,7 @@ export const workerQueue: WorkerVerification[] = [
     document: 'Trade cert + gov ID',
     city: 'Uyo',
     wallet: 'WAL-7782-AK',
-    // Joined days ago with an outsized payout — should raise new_before_large_payout.
+    // Joined days ago with an outsized payout: should raise new_before_large_payout.
     payoutAmount: 70000,
     joinedAt: '2026-07-01T09:00:00',
   },

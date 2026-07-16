@@ -77,7 +77,7 @@ export default function SmartSweep() {
       <PageHeader title="Smart Sweep" subtitle={bill.type} backTo={`/bills/${billId}`} />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
-        {/* Mandate summary — always visible per trust rules */}
+        {/* Mandate summary: always visible per trust rules */}
         <Card className="bg-olive text-card border-0">
           <div className="flex items-center justify-between">
             <p className="text-xs text-card/70">Mandate</p>

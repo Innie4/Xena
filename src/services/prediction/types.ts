@@ -1,9 +1,9 @@
-// Phase 3 — Xena "agent" layer.
+// Phase 3: Xena "agent" layer.
 // Three capabilities, isolated behind a clean interface so a real backend /
 // model / LLM can be swapped in later without touching any UI component:
-//   1. predictTiming  — next likely inflow as a WINDOW + confidence (not a date)
-//   2. scoreReliability — explainable 0..100 score -> fee tier + vouch power
-//   3. detectFraud   — rules-based flags -> human review queue (never auto-blocks)
+//   1. predictTiming: next likely inflow as a WINDOW + confidence (not a date)
+//   2. scoreReliability: explainable 0..100 score -> fee tier + vouch power
+//   3. detectFraud: rules-based flags -> human review queue (never auto-blocks)
 //
 // Today these run deterministically in the browser on seed/history data.
 // Everything the UI shows routes through this module; no fake numbers live in components.

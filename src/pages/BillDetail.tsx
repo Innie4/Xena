@@ -139,7 +139,7 @@ export default function BillDetail() {
               <p className="text-xs font-medium text-olive">Community guarantee</p>
               <p className="text-[11px] text-ink/60 mt-0.5">
                 Your street’s sweep reliability keeps this fee fair. Miss a sweep and the rate eases back
-                up — stay on rhythm and it keeps dropping.
+                up. Stay on rhythm and it keeps dropping.
               </p>
             </div>
           </div>
@@ -161,7 +161,7 @@ export default function BillDetail() {
             ) : null}
             {walletBalance < bill.amount && (
               <p className="text-xs text-brick text-center">
-                Wallet balance is {formatNaira(walletBalance)} — top up to pay in full.
+                Wallet balance is {formatNaira(walletBalance)}. Top up to pay in full.
               </p>
             )}
           </div>
@@ -221,7 +221,7 @@ export default function BillDetail() {
       >
         <p className="text-sm text-ink/75">
           Xena will collect small amounts toward this {bill.type.toLowerCase()} bill whenever your
-          balance stays above ₦2,000 — up to <span className="num">₦500</span> at a time, capped at the
+          balance stays above ₦2,000, up to <span className="num">₦500</span> at a time, capped at the
           bill total. You can pause or cancel anytime.
         </p>
         <p className="text-xs text-ink/50 mt-2">

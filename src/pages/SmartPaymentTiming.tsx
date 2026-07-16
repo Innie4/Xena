@@ -46,8 +46,8 @@ export default function SmartPaymentTiming() {
               <p className="font-medium text-ink">Time bills to your payday</p>
               <p className="text-sm text-ink/65 mt-1">
                 Instead of collecting on a fixed date, Xena waits until around the {day}
-                {day === 1 ? 'st' : day === 2 ? 'nd' : day === 3 ? 'rd' : 'th'} — when money has just
-                landed — then sweeps your bills. This avoids failed collections when your balance is low.
+                {day === 1 ? 'st' : day === 2 ? 'nd' : day === 3 ? 'rd' : 'th'}: when money has just
+                landed, then sweeps your bills. This avoids failed collections when your balance is low.
               </p>
             </div>
             <ToggleSwitch
@@ -59,7 +59,7 @@ export default function SmartPaymentTiming() {
 
           {timing.enabled && (
             <div className="mt-3 pt-3 border-t border-warmgray flex items-center justify-between">
-              <span className="text-xs text-olive font-medium">Active — collecting after the {day}th</span>
+              <span className="text-xs text-olive font-medium">Active: collecting after the {day}th</span>
               <Button variant="danger" size="sm" onClick={() => setConfirmOff(true)}>
                 Cancel
               </Button>

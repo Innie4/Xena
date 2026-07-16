@@ -17,7 +17,7 @@ const labelMap: Record<TagTone, string> = {
   pending: 'Pending',
   in_progress: 'In progress',
   overdue: 'Overdue',
-  neutral: '—',
+  neutral: '-',
   success: 'Funded',
   danger: 'Unpaid',
 }

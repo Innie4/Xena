@@ -96,7 +96,7 @@ export default function CommunityProjectDetail() {
 
           {isFunded && project.worker && (
             <div className="mt-4 bg-gold/10 border border-gold/40 rounded-btn p-3">
-              <p className="text-xs font-medium text-[#8a6516]">Fully funded — work assigned</p>
+              <p className="text-xs font-medium text-[#8a6516]">Fully funded. Work assigned</p>
               <p className="text-sm text-ink mt-1">
                 {project.worker.name} · {project.worker.skill}
               </p>

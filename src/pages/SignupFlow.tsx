@@ -135,18 +135,18 @@ export default function SignupFlow() {
   const { login } = useApp()
   const [step, setStep] = useState(0)
 
-  // Step 1 — BVN
+  // Step 1: BVN
   const [bvn, setBvn] = useState('')
   const [looking, setLooking] = useState(false)
   const [lookup, setLookup] = useState<ReturnType<typeof lookupBVN> | null>(null)
 
-  // Step 2 — bank
+  // Step 2: bank
   const [selected, setSelected] = useState<LinkedAccount | null>(null)
 
-  // Step 3 — OTP
+  // Step 3: OTP
   const [otp, setOtp] = useState('')
 
-  // Step 4 — street
+  // Step 4: street
   const [mode, setMode] = useState<'choose' | 'locate' | 'type'>('choose')
   const [locating, setLocating] = useState(false)
   const [suggested, setSuggested] = useState<{ id: string; name: string; city: string } | null>(null)
@@ -259,7 +259,7 @@ export default function SignupFlow() {
             exit={{ opacity: 0, x: -16 }}
             transition={{ duration: 0.25 }}
           >
-            {/* STEP 1 — BVN */}
+            {/* STEP 1: BVN */}
             {step === 0 && (
               <div>
                 <span className="inline-block text-xs font-medium uppercase tracking-wider text-terracotta">
@@ -269,7 +269,7 @@ export default function SignupFlow() {
                   Your BVN is all we need.
                 </h1>
                 <p className="text-ink/65 mt-2 text-sm">
-                  One number unlocks your banks — no passwords, no typing account details.
+                  One number unlocks your banks. No passwords, no typing account details.
                 </p>
 
                 <div className="mt-6">
@@ -315,7 +315,7 @@ export default function SignupFlow() {
               </div>
             )}
 
-            {/* STEP 2 — linked accounts */}
+            {/* STEP 2: linked accounts */}
             {step === 1 && lookup && (
               <div>
                 <motion.div
@@ -329,7 +329,7 @@ export default function SignupFlow() {
                   Pick the account to link.
                 </h1>
                 <p className="text-ink/65 mt-1 text-sm">
-                  These are pulled from your BVN via Open Banking. Choose one — you can add more later.
+                  These are pulled from your BVN via Open Banking. Choose one. You can add more later.
                 </p>
 
                 <div className="mt-5 space-y-2.5">
@@ -412,13 +412,13 @@ export default function SignupFlow() {
               </div>
             )}
 
-            {/* STEP 3 — OTP */}
+            {/* STEP 3: OTP */}
             {step === 2 && lookup && (
               <div>
                 <h1 className="font-serif text-2xl sm:text-3xl text-ink">One quick check.</h1>
                 <p className="text-ink/65 mt-2 text-sm">
                   We sent a 6-digit code to{' '}
-                  <span className="num text-ink">{lookup.phone}</span> — the number on your BVN. Any
+                  <span className="num text-ink">{lookup.phone}</span>, the number on your BVN. Any
                   6 digits work for this demo.
                 </p>
 
@@ -445,7 +445,7 @@ export default function SignupFlow() {
               </div>
             )}
 
-            {/* STEP 4 — street */}
+            {/* STEP 4: street */}
             {step === 3 && (
               <div>
                 <h1 className="font-serif text-2xl sm:text-3xl text-ink">Where’s home?</h1>

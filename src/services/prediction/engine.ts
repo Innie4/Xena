@@ -1,4 +1,4 @@
-// Phase 3 — deterministic in-browser implementation of the PredictionEngine.
+// Phase 3: deterministic in-browser implementation of the PredictionEngine.
 // Pure functions over the typed inputs; no UI, no fake numbers. A real model
 // can later implement the same PredictionEngine interface and be dropped in.
 
@@ -85,8 +85,8 @@ export const browserEngine: PredictionEngine = {
         confidence: 0.15,
         basis:
           sampleSize === 0
-            ? 'No contribution history yet — showing a gentle 2-week nudge.'
-            : 'Only one contribution on record — too little to read a rhythm.',
+            ? 'No contribution history yet. Showing a gentle 2-week nudge.'
+            : 'Only one contribution on record. Too little to read a rhythm.',
         sampleSize,
       }
     }
@@ -202,7 +202,7 @@ export const browserEngine: PredictionEngine = {
             ? 'Needs more data to see a pattern.'
             : consistency > 0.7
               ? 'Very predictable cadence.'
-              : 'Cadence varies — that is normal for some streets.',
+              : 'Cadence varies. That is normal for some streets.',
       },
       {
         key: 'streak',
@@ -255,7 +255,7 @@ export const browserEngine: PredictionEngine = {
     const flags: FraudFlag[] = []
     const now = new Date()
 
-    // shared_wallet — multiple workers banking to the same wallet address.
+    // shared_wallet: multiple workers banking to the same wallet address.
     const byWallet = new Map<string, FraudInputWorker[]>()
     for (const w of input.workers) {
       if (!w.wallet) continue
@@ -286,7 +286,7 @@ export const browserEngine: PredictionEngine = {
       })
     }
 
-    // payout_velocity_spike — one worker paid several times in a short window,
+    // payout_velocity_spike: one worker paid several times in a short window,
     // or a single payout far above the street norm.
     const byWorker = new Map<string, WorkerPayoutRecord[]>()
     for (const p of input.payouts) {
@@ -334,7 +334,7 @@ export const browserEngine: PredictionEngine = {
       }
     }
 
-    // geo_mismatch — worker operating in a city different from their registered street.
+    // geo_mismatch: worker operating in a city different from their registered street.
     // Only fires when the street string carries a "City · Street" prefix (seed format),
     // so plain street names never false-positive.
     for (const w of input.workers) {
@@ -362,7 +362,7 @@ export const browserEngine: PredictionEngine = {
       }
     }
 
-    // new_before_large_payout — recently joined worker with an outsized payout.
+    // new_before_large_payout: recently joined worker with an outsized payout.
     for (const w of input.workers) {
       const big = w.payoutAmount ?? 0
       const joined = w.joinedAt ? (now.getTime() - new Date(w.joinedAt).getTime()) / DAY_MS : 9999
@@ -391,12 +391,12 @@ export const browserEngine: PredictionEngine = {
 
   summarizePattern(profile): string {
     const events = profile.events
-    if (events.length === 0) return 'No contributions recorded yet — the street is waiting on a first sweep.'
+    if (events.length === 0) return 'No contributions recorded yet. The street is waiting on a first sweep.'
     const pred = this.predictTiming(profile)
     const rel = this.scoreReliability(profile)
     const cadence =
       pred.sampleSize >= 2
-        ? `usually gives around day ${pred.expectedDayOfMonth ?? '—'} of the month`
+        ? `usually gives around day ${pred.expectedDayOfMonth ?? '-'} of the month`
         : 'has only just started giving'
     const tierLine = rel.tier.id === 'standard' ? 'still building trust' : `sits at ${rel.tier.label}`
     return `${profile.name} ${cadence}, with about ${Math.round(
@@ -433,7 +433,7 @@ const STREET_RANKS: { min: number; rank: StreetRank }[] = [
     rank: {
       id: 'cornerstone',
       label: 'Cornerstone',
-      blurb: 'Reliable — your sweep lands on rhythm.',
+      blurb: 'Reliable. Your sweep lands on rhythm.',
     },
   },
   {
@@ -449,7 +449,7 @@ const STREET_RANKS: { min: number; rank: StreetRank }[] = [
     rank: {
       id: 'newcomer',
       label: 'Newcomer',
-      blurb: 'New on the street — every sweep builds your standing.',
+      blurb: 'New on the street. Every sweep builds your standing.',
     },
   },
 ]

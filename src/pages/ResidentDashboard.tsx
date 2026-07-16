@@ -57,7 +57,7 @@ export default function ResidentDashboard() {
         </Card>
 
         <div className="lg:grid lg:grid-cols-3 lg:gap-5 space-y-5 lg:space-y-0">
-          {/* Street standing — AI-derived reliability + next contribution */}
+          {/* Street standing: AI-derived reliability + next contribution */}
           <div className="lg:col-span-3">
             <StandingCard profile={profile} />
           </div>

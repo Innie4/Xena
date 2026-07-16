@@ -70,7 +70,7 @@ export default function CommunityProjects() {
         ) : streetProjects.length === 0 ? (
           <EmptyState
             title="No projects yet"
-            message="Your street hasn’t started a community project. Propose one in the voting screen."
+            message="Your street hasn’t started a waste project. Propose one in the voting screen."
           />
         ) : (
           <div className="space-y-3">
