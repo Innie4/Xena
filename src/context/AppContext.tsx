@@ -24,6 +24,7 @@ import {
   Proposal,
   Contact,
   ProposalCategory,
+  LinkedAccount,
 } from '../mockData'
 
 export interface SweepLogEntry {
@@ -51,6 +52,7 @@ interface AppState {
   workerQueue: WorkerVerification[]
   routeStops: RouteStop[]
   sweepLog: SweepLogEntry[]
+  linkedAccounts: LinkedAccount[]
 }
 
 interface AppContextValue extends AppState {
@@ -83,6 +85,9 @@ interface AppContextValue extends AppState {
   markAllRead: () => void
   updateUser: (patch: Partial<User>) => void
   getStreetName: (id: string) => string
+  connectBanks: (bvn: string, accounts: LinkedAccount[]) => void
+  disconnectBanks: () => void
+  setLinkedAccounts: (accounts: LinkedAccount[]) => void
 }
 
 const AppContext = createContext<AppContextValue | null>(null)
@@ -119,6 +124,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     workerQueue: seedWorkers,
     routeStops: seedRoutes,
     sweepLog: [],
+    linkedAccounts: currentUser.linkedAccounts ?? [],
   })
 
   const login = useCallback((user: User) => {
@@ -452,6 +458,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setState((s) => (s.user ? { ...s, user: { ...s.user, ...patch } } : s))
   }, [])
 
+  const setLinkedAccounts = useCallback((accounts: LinkedAccount[]) => {
+    setState((s) => ({
+      ...s,
+      linkedAccounts: accounts,
+      user: s.user ? { ...s.user, linkedAccounts: accounts } : s.user,
+    }))
+  }, [])
+
+  const connectBanks = useCallback((bvn: string, accounts: LinkedAccount[]) => {
+    setState((s) => ({
+      ...s,
+      linkedAccounts: accounts,
+      user: s.user
+        ? {
+            ...s.user,
+            bvn,
+            linkedAccounts: accounts,
+            bankConnected: accounts.length > 0,
+            bankName: accounts[0]?.bank ?? s.user.bankName,
+            accountName: accounts[0]?.accountName ?? s.user.accountName,
+          }
+        : s.user,
+    }))
+  }, [])
+
+  const disconnectBanks = useCallback(() => {
+    setState((s) => ({
+      ...s,
+      linkedAccounts: [],
+      user: s.user
+        ? { ...s.user, bvn: undefined, linkedAccounts: [], bankConnected: false, bankName: '', accountName: '' }
+        : s.user,
+    }))
+  }, [])
+
   useEffect(() => {
     resolveProposals()
   }, [resolveProposals])
@@ -481,6 +522,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     markAllRead,
     updateUser,
     getStreetName,
+    connectBanks,
+    disconnectBanks,
+    setLinkedAccounts,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

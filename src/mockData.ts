@@ -90,9 +90,12 @@ export interface User {
   firstName: string
   phone: string
   streetId: string
+  address?: string
   bankConnected: boolean
   bankName: string
   accountName: string
+  bvn?: string
+  linkedAccounts?: LinkedAccount[]
   contributions?: UserContribution[]
 }
 
@@ -647,6 +650,31 @@ export function lookupBVN(bvn: string): BvnLookup {
   const phone = '+234 ' + local.slice(0, 3) + ' ' + local.slice(3, 6) + ' ' + local.slice(6)
 
   return { phone, accountName: 'Iniobong Udofia', accounts }
+}
+
+// Simulated Open Banking: a BVN links to 6 banks (demo, deterministic).
+// Used by the Profile "connect your banks" flow; no real network call.
+export function simulateBvnAccounts(bvn: string): LinkedAccount[] {
+  const digits = (bvn.replace(/\D/g, '') + '00000000000').slice(0, 11)
+  const makeAcct = (seed: number) =>
+    (parseInt(digits.slice(1) || '1000000000', 10) + seed * 10007)
+      .toString()
+      .replace(/\D/g, '')
+      .padStart(10, '0')
+      .slice(-10)
+  const bankNames = [
+    'Kuda Microfinance Bank',
+    'Opay',
+    'PalmPay',
+    'Moniepoint',
+    'GTBank',
+    'Access Bank',
+  ]
+  return bankNames.map((bank, i) => ({
+    bank,
+    accountNumber: makeAcct(i + 1),
+    accountName: 'Iniobong Udofia',
+  }))
 }
 
 // ---------------------------------------------------------------------------

@@ -3,6 +3,7 @@ import BottomNav from './components/BottomNav'
 import Sidebar from './components/Sidebar'
 import Landing from './pages/Landing'
 import SignupFlow from './pages/SignupFlow'
+import Login from './pages/Login'
 import ResidentDashboard from './pages/ResidentDashboard'
 import BillsDetail from './pages/BillsDetail'
 import BillDetail from './pages/BillDetail'
@@ -48,6 +49,7 @@ export default function App() {
       <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/signup" element={<SignupFlow />} />
+      <Route path="/login" element={<Login />} />
 
       <Route element={<ResidentLayout />}>
         <Route path="/app" element={<ResidentDashboard />} />

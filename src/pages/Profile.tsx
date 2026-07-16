@@ -3,10 +3,12 @@ import { useState } from 'react'
 import PageHeader from '../components/PageHeader'
 import Card from '../components/Card'
 import Button from '../components/Button'
+import Input from '../components/Input'
+import ToggleSwitch from '../components/ToggleSwitch'
 import StandingCard from '../components/StandingCard'
 import Modal, { SuccessModal } from '../components/Modal'
 import { useApp } from '../context/AppContext'
-import { formatNaira } from '../mockData'
+import { formatNaira, simulateBvnAccounts, LinkedAccount } from '../mockData'
 import { ContributorProfile } from '../services/prediction/types'
 import { useGame, BADGES } from '../game'
 import GameStrip from '../game/components/GameStrip'
@@ -23,12 +25,74 @@ export default function Profile() {
     cancelMandate,
     toggleTiming,
     bills,
+    linkedAccounts,
+    connectBanks,
+    disconnectBanks,
   } = useApp()
   const game = useGame()
 
   const [cancelId, setCancelId] = useState<string | null>(null)
   const [cancelTiming, setCancelTiming] = useState(false)
   const [done, setDone] = useState('')
+
+  // Open Banking link flow (simulated)
+  const [bvnLinkOpen, setBvnLinkOpen] = useState(false)
+  const [bvnInput, setBvnInput] = useState('')
+  const [bvnError, setBvnError] = useState<string | null>(null)
+  const [simAccounts, setSimAccounts] = useState<LinkedAccount[]>([])
+  const [picked, setPicked] = useState<Set<string>>(new Set())
+  const [linking, setLinking] = useState(false)
+
+  const bvnDigits = bvnInput.replace(/\D/g, '')
+  const bvnOk = bvnDigits.length === 11
+
+  const startLink = () => {
+    setBvnLinkOpen(true)
+    setBvnError(null)
+    setSimAccounts([])
+    setPicked(new Set())
+  }
+
+  const runLookup = () => {
+    if (!bvnOk) return
+    setBvnError(null)
+    const accounts = simulateBvnAccounts(bvnDigits)
+    setSimAccounts(accounts)
+    setPicked(new Set(accounts.map((a) => a.accountNumber)))
+  }
+
+  const togglePick = (num: string) => {
+    setPicked((prev) => {
+      const next = new Set(prev)
+      if (next.has(num)) next.delete(num)
+      else next.add(num)
+      return next
+    })
+  }
+
+  const confirmLink = () => {
+    const chosen = simAccounts.filter((a) => picked.has(a.accountNumber))
+    if (chosen.length === 0) return
+    setLinking(true)
+    setTimeout(() => {
+      connectBanks(bvnDigits, chosen)
+      setLinking(false)
+      setBvnLinkOpen(false)
+      setSimAccounts([])
+      setPicked(new Set())
+      setBvnInput('')
+      setDone(`Linked ${chosen.length} bank${chosen.length > 1 ? 's' : ''} via Open Banking`)
+    }, 500)
+  }
+
+  const turnOff = () => {
+    disconnectBanks()
+    setBvnLinkOpen(false)
+    setSimAccounts([])
+    setPicked(new Set())
+    setBvnInput('')
+    setDone('Banks disconnected')
+  }
 
   const activeMandates = sweepMandates.filter((m) => m.active)
   const billTypeFor = (billId: string) =>
@@ -74,6 +138,7 @@ export default function Profile() {
                 <p className="font-medium text-ink">{user?.name}</p>
                 <p className="text-xs text-ink/55">{user?.phone}</p>
                 <p className="text-xs text-ink/55">{getStreetName(activeStreetId)}</p>
+                {user?.address && <p className="text-xs text-ink/55">{user.address}</p>}
               </div>
             </div>
           </Card>
@@ -81,18 +146,119 @@ export default function Profile() {
           <Card>
             <div className="flex items-center justify-between">
               <div>
-                <p className="label-text">Linked bank</p>
-                <p className="font-medium text-ink mt-0.5">{user?.bankName}</p>
-                <p className="text-xs text-ink/55">{user?.accountName}</p>
+                <p className="label-text">Linked banks</p>
+                <p className="font-medium text-ink mt-0.5">
+                  {linkedAccounts.length > 0
+                    ? `${linkedAccounts.length} bank${linkedAccounts.length > 1 ? 's' : ''} connected`
+                    : 'None yet'}
+                </p>
+                <p className="text-xs text-ink/55">
+                  {linkedAccounts[0]?.accountName ?? user?.accountName ?? 'Open Banking (simulated)'}
+                </p>
               </div>
-              <span className="inline-flex items-center gap-1 text-xs text-olive font-medium bg-olive/10 px-2.5 py-1 rounded-full">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                Connected
-              </span>
+              <ToggleSwitch
+                checked={linkedAccounts.length > 0}
+                onChange={(on) => (on ? startLink() : turnOff())}
+                label="Connect banks via Open Banking"
+              />
             </div>
-            <p className="text-[11px] text-ink/45 mt-2">Secured via Open Banking · read-only access</p>
+
+            {linkedAccounts.length > 0 && (
+              <div className="mt-3 space-y-2">
+                {linkedAccounts.map((a) => (
+                  <div
+                    key={a.accountNumber}
+                    className="flex items-center justify-between rounded-btn border border-warmgray bg-sand px-3 py-2"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-ink">{a.bank}</p>
+                      <p className="text-xs text-ink/55 num">{a.accountNumber}</p>
+                    </div>
+                    <span className="inline-flex items-center gap-1 text-xs text-olive font-medium">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      Linked
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <p className="text-[11px] text-ink/45 mt-3">Secured via Open Banking · read-only access</p>
+
+            {bvnLinkOpen && (
+              <div className="mt-4 border-t border-warmgray pt-4 space-y-3">
+                {simAccounts.length === 0 ? (
+                  <>
+                    <Input
+                      id="bvn"
+                      label="Bank Verification Number"
+                      type="otp"
+                      placeholder="11 digits"
+                      value={bvnInput}
+                      onChange={(e) => setBvnInput(e.target.value)}
+                      maxLength={11}
+                      trailing={
+                        bvnOk ? (
+                          <span className="text-olive font-medium text-xs">Ready</span>
+                        ) : (
+                          <span className="text-ink/30 text-sm">{bvnDigits.length}/11</span>
+                        )
+                      }
+                    />
+                    {bvnError && <p className="text-sm text-red-500">{bvnError}</p>}
+                    <Button size="sm" fullWidth disabled={!bvnOk} onClick={runLookup}>
+                      Find my banks
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <p className="label-text">Pick the accounts to link</p>
+                    <div className="space-y-2">
+                      {simAccounts.map((a) => {
+                        const on = picked.has(a.accountNumber)
+                        return (
+                          <button
+                            key={a.accountNumber}
+                            onClick={() => togglePick(a.accountNumber)}
+                            className={`w-full text-left rounded-btn border px-3 py-2.5 transition-all ${
+                              on ? 'border-terracotta bg-terracotta/5' : 'border-warmgray bg-card'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-sm font-medium text-ink">{a.bank}</p>
+                                <p className="text-xs text-ink/55 num">{a.accountNumber}</p>
+                              </div>
+                              <span
+                                className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
+                                  on ? 'border-terracotta bg-terracotta' : 'border-warmgray'
+                                }`}
+                              >
+                                {on && (
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#FFFDF8" strokeWidth="3">
+                                    <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                                  </svg>
+                                )}
+                              </span>
+                            </div>
+                          </button>
+                        )
+                      })}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm" onClick={() => { setBvnLinkOpen(false); setSimAccounts([]); setPicked(new Set()) }}>
+                        Cancel
+                      </Button>
+                      <Button size="sm" fullWidth disabled={picked.size === 0 || linking} onClick={confirmLink}>
+                        {linking ? 'Linking…' : `Link ${picked.size} bank${picked.size > 1 ? 's' : ''}`}
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
           </Card>
 
           <StandingCard profile={profile} />

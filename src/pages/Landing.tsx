@@ -348,9 +348,14 @@ export default function Landing() {
             </div>
             <span className="font-display text-xl font-extrabold text-card tracking-tight">Xena</span>
           </div>
-          <Link to="/app" className="text-sm text-gold font-semibold hover:text-card transition-colors">
-            Open app →
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link to="/login" className="text-sm text-card/70 font-semibold hover:text-card transition-colors">
+              Log in
+            </Link>
+            <Link to="/app" className="text-sm text-gold font-semibold hover:text-card transition-colors">
+              Open app →
+            </Link>
+          </div>
         </header>
 
         {/* the opening line */}
@@ -550,8 +555,13 @@ export default function Landing() {
                       Start my street’s run
                     </Button>
                   </Link>
-                  <Link to="/app">
+                  <Link to="/login">
                     <Button variant="secondary" size="lg" className="text-card border-card/40 hover:bg-card/10">
+                      Log in
+                    </Button>
+                  </Link>
+                  <Link to="/app">
+                    <Button variant="ghost" size="lg" className="text-card/80 hover:text-card">
                       Peek inside
                     </Button>
                   </Link>
