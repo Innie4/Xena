@@ -78,9 +78,7 @@ export default function Sidebar() {
   return (
     <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:shrink-0 lg:sticky lg:top-0 lg:h-screen bg-olive text-card border-r border-olive-dark">
       <div className="px-5 py-5 flex items-center gap-2 border-b border-card/10">
-        <div className="h-9 w-9 rounded-card bg-terracotta flex items-center justify-center">
-          <span className="font-display text-card text-lg font-extrabold">X</span>
-        </div>
+        <img src="/actual-xena.png" alt="Xena" className="h-9 w-9 rounded-card object-contain" />
         <span className="font-display text-xl font-extrabold tracking-tight">Xena</span>
       </div>
 

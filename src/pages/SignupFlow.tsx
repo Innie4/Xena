@@ -387,12 +387,10 @@ export default function SignupFlow() {
   return (
     <div className="min-h-screen bg-sand flex flex-col">
       <div className="px-4 sm:px-6 pt-5 flex items-center justify-between w-full lg:max-w-md lg:mx-auto">
-        <div className="flex items-center gap-2">
-          <div className="h-9 w-9 rounded-card bg-terracotta flex items-center justify-center">
-            <span className="font-serif text-card text-lg font-semibold">X</span>
+          <div className="flex items-center gap-2">
+            <img src="/actual-xena.png" alt="Xena" className="h-9 w-9 rounded-card object-contain" />
+            <span className="font-serif text-xl font-semibold text-ink">Xena</span>
           </div>
-          <span className="font-serif text-xl font-semibold text-ink">Xena</span>
-        </div>
         <span className="text-xs text-ink/45">Step {Math.min(step + 1, 3)} of 3</span>
       </div>
 

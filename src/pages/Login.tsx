@@ -145,12 +145,10 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-sand flex flex-col">
       <div className="px-4 sm:px-6 pt-5 flex items-center justify-between w-full lg:max-w-md lg:mx-auto">
-        <div className="flex items-center gap-2">
-          <div className="h-9 w-9 rounded-card bg-terracotta flex items-center justify-center">
-            <span className="font-serif text-card text-lg font-semibold">X</span>
+          <div className="flex items-center gap-2">
+            <img src="/actual-xena.png" alt="Xena" className="h-9 w-9 rounded-card object-contain" />
+            <span className="font-serif text-xl font-semibold text-ink">Xena</span>
           </div>
-          <span className="font-serif text-xl font-semibold text-ink">Xena</span>
-        </div>
         <Link to="/signup" className="text-xs text-ink/45 hover:text-terracotta">
           New here? Sign up
         </Link>

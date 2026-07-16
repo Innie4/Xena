@@ -343,9 +343,7 @@ export default function Landing() {
         {/* nav */}
         <header className="absolute top-0 inset-x-0 z-20 px-5 sm:px-8 pt-6 flex items-center justify-between max-w-6xl mx-auto w-full">
           <div className="flex items-center gap-2">
-            <div className="h-9 w-9 rounded-card bg-terracotta flex items-center justify-center shadow-soft">
-              <span className="font-display text-card text-lg font-extrabold">X</span>
-            </div>
+            <img src="/actual-xena.png" alt="Xena" className="h-9 w-9 rounded-card shadow-soft object-contain" />
             <span className="font-display text-xl font-extrabold text-card tracking-tight">Xena</span>
           </div>
           <div className="flex items-center gap-4">
