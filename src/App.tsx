@@ -14,6 +14,7 @@ import Voting from './pages/Voting'
 import Notifications from './pages/Notifications'
 import Profile from './pages/Profile'
 import EditProfile from './pages/EditProfile'
+import ProposeModal from './components/ProposeModal'
 import OperatorDashboard from './pages/OperatorDashboard'
 import AdminDashboard from './pages/AdminDashboard'
 
@@ -43,7 +44,8 @@ function OperatorLayout() {
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/signup" element={<SignupFlow />} />
 
@@ -68,5 +70,9 @@ export default function App() {
 
       <Route path="*" element={<Landing />} />
     </Routes>
+
+    <ProposeModal />
+    </>
   )
 }
+

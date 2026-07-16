@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react'
+import { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react'
 import {
   currentUser,
   bills as seedBills,
@@ -9,6 +9,8 @@ import {
   voteOptions as seedVotes,
   workerQueue as seedWorkers,
   routeStops as seedRoutes,
+  seedProposals,
+  seedContacts,
   User,
   Bill,
   CommunityProject,
@@ -19,6 +21,9 @@ import {
   WorkerVerification,
   RouteStop,
   Contributor,
+  Proposal,
+  Contact,
+  ProposalCategory,
 } from '../mockData'
 
 export interface SweepLogEntry {
@@ -39,6 +44,10 @@ interface AppState {
   sweepMandates: SmartSweepMandate[]
   timing: PaymentTiming
   votes: VoteOption[]
+  proposals: Proposal[]
+  contacts: Contact[]
+  proposeOpen: boolean
+  lastWinner: { proposalId: string; billId: string; projectId: string; title: string } | null
   workerQueue: WorkerVerification[]
   routeStops: RouteStop[]
   sweepLog: SweepLogEntry[]
@@ -56,6 +65,18 @@ interface AppContextValue extends AppState {
   toggleTiming: (enabled: boolean) => void
   contribute: (projectId: string, amount: number, contributor: Contributor) => void
   castVote: (optionId: string) => void
+  createProposal: (input: {
+    title: string
+    description: string
+    category: ProposalCategory
+    estimatedCost: number
+    voters: string[]
+  }) => string
+  castProposalVote: (proposalId: string) => void
+  resolveProposals: () => void
+  openPropose: () => void
+  closePropose: () => void
+  clearLastWinner: () => void
   approveWorker: (id: string) => void
   rejectWorker: (id: string) => void
   pushNotification: (n: Omit<AppNotification, 'id' | 'read'>) => void
@@ -91,6 +112,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     sweepMandates: seedMandates,
     timing: seedTiming,
     votes: seedVotes,
+    proposals: seedProposals,
+    contacts: seedContacts,
+    proposeOpen: false,
+    lastWinner: null,
     workerQueue: seedWorkers,
     routeStops: seedRoutes,
     sweepLog: [],
@@ -254,6 +279,148 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }))
   }, [])
 
+  const createProposal = useCallback(
+    (input: {
+      title: string
+      description: string
+      category: ProposalCategory
+      estimatedCost: number
+      voters: string[]
+    }) => {
+      const id = nextId('pr')
+      const now = Date.now()
+      const proposal: Proposal = {
+        id,
+        streetId: state.user?.streetId ?? state.activeStreetId,
+        title: input.title.trim(),
+        description: input.description.trim(),
+        category: input.category,
+        estimatedCost: input.estimatedCost,
+        proposerId: state.user?.id ?? 'me',
+        proposerName: state.user?.firstName ?? 'You',
+        voters: input.voters,
+        votes: 0,
+        votedBy: [],
+        startedAt: new Date(now).toISOString(),
+        deadline: new Date(now + 48 * 3600 * 1000).toISOString(),
+        status: 'open',
+      }
+      setState((s) => ({ ...s, proposals: [proposal, ...s.proposals] }))
+      return id
+    },
+    [state.user, state.activeStreetId],
+  )
+
+  const castProposalVote = useCallback((proposalId: string) => {
+    setState((s) => ({
+      ...s,
+      proposals: s.proposals.map((p) =>
+        p.id === proposalId && p.status === 'open' && !p.votedBy.includes(s.user?.id ?? '')
+          ? { ...p, votes: p.votes + 1, votedBy: [...p.votedBy, s.user?.id ?? ''] }
+          : p,
+      ),
+    }))
+  }, [])
+
+  const resolveProposals = useCallback(() => {
+    setState((s) => {
+      const now = Date.now()
+      const open = s.proposals.filter(
+        (p) => p.status === 'open' && new Date(p.deadline).getTime() <= now,
+      )
+      if (open.length === 0) return s
+
+      // Group by deadline: each 48h window is one voting round.
+      const groups = new Map<string, Proposal[]>()
+      for (const p of open) {
+        const arr = groups.get(p.deadline) ?? []
+        arr.push(p)
+        groups.set(p.deadline, arr)
+      }
+
+      const updates: Record<string, Proposal> = {}
+      const newBills: Bill[] = []
+      const newProjects: CommunityProject[] = []
+      const newNotifications: AppNotification[] = []
+      let winnerInfo = s.lastWinner
+
+      for (const group of groups.values()) {
+        const leader = group.reduce((a, b) => (b.votes > a.votes ? b : a))
+        for (const p of group) {
+          if (p.id === leader.id) {
+            const billId = `bill-${p.id}`
+            const projectId = `proj-${p.id}`
+            if (!p.winnerBillId) {
+              const due = new Date(new Date(p.deadline).getTime() + 14 * 86400000)
+                .toISOString()
+                .slice(0, 10)
+              newBills.push({
+                id: billId,
+                residentId: s.user?.id ?? 'me',
+                type: p.category,
+                provider: `Community vote · ${STREET_NAMES[p.streetId] ?? p.streetId}`,
+                amount: p.estimatedCost,
+                dueDate: due,
+                status: 'pending',
+                smartSweepActive: false,
+                source: 'Community vote',
+              })
+              newProjects.push({
+                id: projectId,
+                streetId: p.streetId,
+                title: p.title,
+                description: p.description,
+                category: p.category,
+                raised: 0,
+                goal: p.estimatedCost,
+                daysRemaining: 14,
+                status: 'active',
+                contributors: [],
+              })
+              newNotifications.push({
+                id: nextId('n'),
+                type: 'community',
+                message: `“${p.title}” won the street vote. It’s now a bill and a community project.`,
+                timestamp: new Date().toISOString(),
+                read: false,
+              })
+              winnerInfo = { proposalId: p.id, billId, projectId, title: p.title }
+            }
+            updates[p.id] = {
+              ...p,
+              status: 'won',
+              winnerBillId: billId,
+              winnerProjectId: projectId,
+            }
+          } else {
+            updates[p.id] = { ...p, status: 'lost' }
+          }
+        }
+      }
+
+      return {
+        ...s,
+        proposals: s.proposals.map((p) => updates[p.id] ?? p),
+        bills: [...newBills, ...s.bills],
+        projects: [...newProjects, ...s.projects],
+        notifications: [...newNotifications, ...s.notifications],
+        lastWinner: winnerInfo,
+      }
+    })
+  }, [])
+
+  const openPropose = useCallback(() => {
+    setState((s) => ({ ...s, proposeOpen: true }))
+  }, [])
+
+  const closePropose = useCallback(() => {
+    setState((s) => ({ ...s, proposeOpen: false }))
+  }, [])
+
+  const clearLastWinner = useCallback(() => {
+    setState((s) => ({ ...s, lastWinner: null }))
+  }, [])
+
   const approveWorker = useCallback((id: string) => {
     setState((s) => ({
       ...s,
@@ -285,6 +452,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setState((s) => (s.user ? { ...s, user: { ...s.user, ...patch } } : s))
   }, [])
 
+  useEffect(() => {
+    resolveProposals()
+  }, [resolveProposals])
+
   const value: AppContextValue = {
     ...state,
     login,
@@ -298,6 +469,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     toggleTiming,
     contribute,
     castVote,
+    createProposal,
+    castProposalVote,
+    resolveProposals,
+    openPropose,
+    closePropose,
+    clearLastWinner,
     approveWorker,
     rejectWorker,
     pushNotification,

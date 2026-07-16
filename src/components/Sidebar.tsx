@@ -66,7 +66,7 @@ const items = [
 ]
 
 export default function Sidebar() {
-  const { user, walletBalance, getStreetName, activeStreetId, notifications } = useApp()
+  const { user, walletBalance, getStreetName, activeStreetId, notifications, openPropose } = useApp()
   const unread = notifications.filter((n) => !n.read).length
 
   return (
@@ -76,6 +76,20 @@ export default function Sidebar() {
           <span className="font-display text-card text-lg font-extrabold">X</span>
         </div>
         <span className="font-display text-xl font-extrabold tracking-tight">Xena</span>
+      </div>
+
+      <div className="px-3 pt-4">
+        <button
+          onClick={openPropose}
+          className="w-full flex items-center gap-3 rounded-btn bg-gradient-to-r from-terracotta to-gold px-3 py-2.5 text-card shadow-sm hover:opacity-95 active:opacity-90 transition-opacity"
+        >
+          <span className="h-8 w-8 rounded-full bg-card/20 flex items-center justify-center shrink-0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4">
+              <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+            </svg>
+          </span>
+          <span className="font-medium">Propose</span>
+        </button>
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1">

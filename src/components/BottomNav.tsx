@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { useApp } from '../context/AppContext'
 
 const items = [
   {
@@ -45,8 +46,18 @@ const items = [
 ]
 
 export default function BottomNav() {
+  const { openPropose } = useApp()
   return (
-    <nav className="sticky bottom-0 z-30 bg-card/95 backdrop-blur border-t border-warmgray lg:hidden">
+    <nav className="relative sticky bottom-0 z-30 bg-card/95 backdrop-blur border-t border-warmgray lg:hidden">
+      <button
+        onClick={openPropose}
+        aria-label="Propose an idea"
+        className="absolute left-1/2 -translate-x-1/2 -top-7 h-14 w-14 rounded-full bg-gradient-to-br from-terracotta to-gold text-card shadow-lg shadow-terracotta/30 flex items-center justify-center ring-4 ring-card hover:scale-105 active:scale-95 transition-transform"
+      >
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+          <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+        </svg>
+      </button>
       <div className="max-w-md mx-auto flex justify-around items-stretch">
         {items.map((item) => (
           <NavLink

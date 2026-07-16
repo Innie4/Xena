@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
 import Card from '../components/Card'
 import StatusTag from '../components/StatusTag'
+import ResolvedBanner from '../components/ResolvedBanner'
 import { EmptyState } from '../components/states'
 import { useApp } from '../context/AppContext'
 import { formatNaira, formatDate } from '../mockData'
@@ -21,6 +22,8 @@ export default function BillsDetail() {
       <PageHeader title="Bills" subtitle="Everything you owe, in one place" backTo="/app" />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
+        <ResolvedBanner />
+
         {loading ? (
           <div className="card-base p-6 text-center text-ink/50 text-sm">Loading your bills…</div>
         ) : bills.length === 0 ? (
@@ -52,6 +55,11 @@ export default function BillsDetail() {
                         {b.smartSweepActive && ' · Smart Sweep on'}
                       </p>
                       <p className="text-xs text-ink/45 mt-0.5">Due {formatDate(b.dueDate)}</p>
+                      {b.source && (
+                        <span className="inline-flex mt-1.5 text-[11px] font-medium text-[#8a6516] bg-gold/15 border border-gold/40 px-2 py-0.5 rounded-full">
+                          {b.source}
+                        </span>
+                      )}
                     </div>
                     <div className="text-right">
                       <p className="num">{formatNaira(b.amount)}</p>

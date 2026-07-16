@@ -6,13 +6,23 @@ export type BillStatus = 'paid' | 'pending' | 'in_progress' | 'overdue'
 export interface Bill {
   id: string
   residentId: string
-  type: 'Trash collection' | 'Water' | 'Electricity' | 'Waste pickup' | 'Security'
+  type:
+    | 'Trash collection'
+    | 'Water'
+    | 'Electricity'
+    | 'Waste pickup'
+    | 'Security'
+    | 'Gate pickup'
+    | 'Gutter clearing'
+    | 'Waste packing'
+    | 'Sanitation'
   provider: string
   amount: number
   dueDate: string // ISO date
   status: BillStatus
   smartSweepActive: boolean
   smartSweepCollected?: number // amount collected so far by smart sweep
+  source?: string // where the bill came from, e.g. "Community vote"
 }
 
 export interface Contributor {
@@ -84,6 +94,41 @@ export interface User {
   bankName: string
   accountName: string
   contributions?: UserContribution[]
+}
+
+export type ProposalCategory =
+  | 'Gate pickup'
+  | 'Gutter clearing'
+  | 'Waste packing'
+  | 'Security'
+  | 'Sanitation'
+
+export type ProposalStatus = 'open' | 'won' | 'lost'
+
+export interface Proposal {
+  id: string
+  streetId: string
+  title: string
+  description: string
+  category: ProposalCategory
+  estimatedCost: number
+  proposerId: string
+  proposerName: string
+  voters: string[] // invited contact ids
+  votes: number // total votes cast so far
+  votedBy: string[] // resident ids who have voted
+  startedAt: string // ISO
+  deadline: string // ISO, 48h after start
+  status: ProposalStatus
+  winnerBillId?: string
+  winnerProjectId?: string
+}
+
+export interface Contact {
+  id: string
+  name: string
+  phone: string
+  streetId: string
 }
 
 export interface VoteOption {
@@ -381,6 +426,92 @@ export const voteOptions: VoteOption[] = [
     description: 'Keep the gate pickup from overflowing on busy market days.',
     votes: 12,
     votedBy: [],
+  },
+]
+
+// ---- Phone book (contacts residents can invite to vote) ----
+export const seedContacts: Contact[] = [
+  { id: 'ct-1', name: 'Aniefiok', phone: '+234 803 555 0101', streetId: 'st-abak' },
+  { id: 'ct-2', name: 'Uduak', phone: '+234 805 555 0102', streetId: 'st-abak' },
+  { id: 'ct-3', name: 'Ekemini', phone: '+234 706 555 0103', streetId: 'st-abak' },
+  { id: 'ct-4', name: 'Mbuotidem', phone: '+234 809 555 0104', streetId: 'st-abak' },
+  { id: 'ct-5', name: 'Effiong', phone: '+234 813 555 0105', streetId: 'st-abak' },
+  { id: 'ct-6', name: 'Atim', phone: '+234 817 555 0106', streetId: 'st-abak' },
+  { id: 'ct-7', name: 'Oto-obong', phone: '+234 818 555 0107', streetId: 'st-abak' },
+  { id: 'ct-8', name: 'Idara', phone: '+234 802 555 0108', streetId: 'st-abak' },
+]
+
+// ---- Community funding proposals ----
+// Two rounds are seeded: a past round (deadline already passed) that resolves on
+// load into a bill + community project, and one open round still counting down.
+const PROP_NOW = Date.now()
+const PROP_HOUR = 3600 * 1000
+const isoFromNow = (ms: number) => new Date(PROP_NOW + ms).toISOString()
+
+export const seedProposals: Proposal[] = [
+  {
+    id: 'pr-paint',
+    streetId: 'st-abak',
+    title: 'Repaint the faded street name signs',
+    description: 'New reflective signs at both ends of Abak Road.',
+    category: 'Sanitation',
+    estimatedCost: 45000,
+    proposerId: 'u-aniefiok',
+    proposerName: 'Aniefiok',
+    voters: ['ct-1', 'ct-2', 'ct-3', 'ct-4', 'ct-5', 'ct-6'],
+    votes: 38,
+    votedBy: ['u-1', 'u-2', 'u-3'],
+    startedAt: isoFromNow(-50 * PROP_HOUR),
+    deadline: isoFromNow(-2 * PROP_HOUR),
+    status: 'open',
+  },
+  {
+    id: 'pr-sweep',
+    streetId: 'st-abak',
+    title: 'Weekly community sweep by the market',
+    description: 'Pay a small team to sweep the market stretch every Saturday.',
+    category: 'Waste packing',
+    estimatedCost: 72000,
+    proposerId: 'u-uduak',
+    proposerName: 'Uduak',
+    voters: ['ct-1', 'ct-2', 'ct-3', 'ct-4', 'ct-5', 'ct-6', 'ct-7'],
+    votes: 51,
+    votedBy: ['u-1', 'u-2', 'u-3', 'u-4', 'u-5'],
+    startedAt: isoFromNow(-50 * PROP_HOUR),
+    deadline: isoFromNow(-2 * PROP_HOUR),
+    status: 'open',
+  },
+  {
+    id: 'pr-trees',
+    streetId: 'st-abak',
+    title: 'Plant shade trees along the pavement',
+    description: 'Twenty mahogany saplings from the nursery on Oron Road.',
+    category: 'Gate pickup',
+    estimatedCost: 30000,
+    proposerId: 'u-ekemini',
+    proposerName: 'Ekemini',
+    voters: ['ct-1', 'ct-2', 'ct-3', 'ct-4'],
+    votes: 19,
+    votedBy: ['u-1', 'u-2'],
+    startedAt: isoFromNow(-50 * PROP_HOUR),
+    deadline: isoFromNow(-2 * PROP_HOUR),
+    status: 'open',
+  },
+  {
+    id: 'pr-bin',
+    streetId: 'st-abak',
+    title: 'Second gate bin for the street',
+    description: 'Keep the gate pickup from overflowing on busy market days.',
+    category: 'Gutter clearing',
+    estimatedCost: 25000,
+    proposerId: 'u-iniobong',
+    proposerName: 'Iniobong',
+    voters: ['ct-1', 'ct-2', 'ct-3', 'ct-4', 'ct-5'],
+    votes: 7,
+    votedBy: [],
+    startedAt: isoFromNow(-2 * PROP_HOUR),
+    deadline: isoFromNow(46 * PROP_HOUR),
+    status: 'open',
   },
 ]
 

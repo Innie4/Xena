@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
 import Card from '../components/Card'
 import FlameRing from '../components/FlameRing'
+import ResolvedBanner from '../components/ResolvedBanner'
 import { EmptyState } from '../components/states'
 import { useApp } from '../context/AppContext'
 import { browserEngine, streetRankForScore } from '../services/prediction/engine'
@@ -38,6 +39,8 @@ export default function CommunityProjects() {
       />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
+        <ResolvedBanner />
+
         <Card className="flex items-center justify-between">
           <div>
             <p className="font-medium text-ink">{streetProjects.filter((p) => p.status === 'active').length} active</p>
