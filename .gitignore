@@ -34,8 +34,21 @@ coverage
 
 # =====================================================
 # Backend Configurations
+
+# =======================================================
+# Backend Configurations
+# =======================================================
 backend/.env
-backend/__pycache__/
-backend/*.pyc
 backend/venv/
 backend/.venv/
+.venv/
+venv/
+env/
+.env*
+
+# Python Cache
+**/__pycache__/
+**/*.pyc
+.pytest_cache/
+
+
