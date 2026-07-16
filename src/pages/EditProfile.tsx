@@ -6,6 +6,7 @@ import Button from '../components/Button'
 import Input from '../components/Input'
 import { SuccessModal } from '../components/Modal'
 import { useApp } from '../context/AppContext'
+import GameStrip from '../game/components/GameStrip'
 
 export default function EditProfile() {
   const { user, activeStreetId, getStreetName, updateUser } = useApp()
@@ -29,6 +30,7 @@ export default function EditProfile() {
       <PageHeader title="Edit profile" backTo="/profile" showBell={false} />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
+        <GameStrip />
         <Card className="space-y-4">
           <Input
             id="name"

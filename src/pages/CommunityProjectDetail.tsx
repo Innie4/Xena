@@ -11,6 +11,7 @@ import Modal, { SuccessModal } from '../components/Modal'
 import ToggleSwitch from '../components/ToggleSwitch'
 import { useApp } from '../context/AppContext'
 import { formatNaira, formatDate, Contributor } from '../mockData'
+import GameStrip from '../game/components/GameStrip'
 
 export default function CommunityProjectDetail() {
   const { id } = useParams()
@@ -56,7 +57,8 @@ export default function CommunityProjectDetail() {
       <PageHeader title="Community Wallet" subtitle={project.category} backTo="/community" />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
-      <Card className="relative">
+        <GameStrip />
+        <Card className="relative">
         <div className="flex items-start justify-between gap-2">
           <h2 className="font-serif text-xl text-ink leading-snug">{project.title}</h2>
             <AnimatePresence>

@@ -6,6 +6,7 @@ import { EmptyState } from '../components/states'
 import { useApp } from '../context/AppContext'
 import { timeAgo } from '../mockData'
 import { useFakeLoad } from '../hooks/useFakeLoad'
+import GameStrip from '../game/components/GameStrip'
 
 const typeStyle: Record<string, { color: string; bg: string; icon: JSX.Element }> = {
   sweep: {
@@ -64,6 +65,7 @@ export default function Notifications() {
       <PageHeader title="Notifications" subtitle={`${unread} unread`} backTo="/app" />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5">
+        <GameStrip />
         {loading ? (
           <div className="card-base p-6 text-center text-ink/50 text-sm">Loading notifications…</div>
         ) : notifications.length === 0 ? (

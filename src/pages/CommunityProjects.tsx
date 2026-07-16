@@ -9,6 +9,7 @@ import { browserEngine, streetRankForScore } from '../services/prediction/engine
 import { ContributorProfile } from '../services/prediction/types'
 import { formatNaira } from '../mockData'
 import { useFakeLoad } from '../hooks/useFakeLoad'
+import GameStrip from '../game/components/GameStrip'
 
 export default function CommunityProjects() {
   const { projects, activeStreetId, getStreetName, user } = useApp()
@@ -39,6 +40,8 @@ export default function CommunityProjects() {
       />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
+        <GameStrip />
+        <p className="text-sm text-ink/60 -mt-2">Every contribution lights the street’s next project.</p>
         <ResolvedBanner />
 
         <Card className="flex items-center justify-between">

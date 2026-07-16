@@ -9,6 +9,7 @@ import { useApp } from '../context/AppContext'
 import { formatNaira, formatDate } from '../mockData'
 import { ContributorProfile } from '../services/prediction/types'
 import { useFakeLoad } from '../hooks/useFakeLoad'
+import GamePanel from '../game/components/GamePanel'
 
 export default function ResidentDashboard() {
   const { user, bills, projects, activeStreetId, getStreetName, walletBalance } = useApp()
@@ -55,6 +56,10 @@ export default function ResidentDashboard() {
             </Link>
           </div>
         </Card>
+
+        <div className="mb-5">
+          <GamePanel />
+        </div>
 
         <div className="lg:grid lg:grid-cols-3 lg:gap-5 space-y-5 lg:space-y-0">
           {/* Street standing: AI-derived reliability + next contribution */}

@@ -8,6 +8,7 @@ import ResolvedBanner from '../components/ResolvedBanner'
 import { useApp } from '../context/AppContext'
 import { formatNaira } from '../mockData'
 import { useFakeLoad } from '../hooks/useFakeLoad'
+import GameStrip from '../game/components/GameStrip'
 
 export default function Voting() {
   const { proposals, contacts, activeStreetId, user, castProposalVote } = useApp()
@@ -26,6 +27,8 @@ export default function Voting() {
       <PageHeader title="Vote" subtitle="Fund the next street project" backTo="/app" />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
+        <GameStrip />
+        <p className="text-sm text-ink/60 -mt-2">Your vote decides what the street builds next.</p>
         <ResolvedBanner />
 
         {loading ? (

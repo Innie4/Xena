@@ -6,6 +6,7 @@ import Button from '../components/Button'
 import ToggleSwitch from '../components/ToggleSwitch'
 import Modal, { SuccessModal } from '../components/Modal'
 import { useApp } from '../context/AppContext'
+import GameStrip from '../game/components/GameStrip'
 
 export default function SmartPaymentTiming() {
   const navigate = useNavigate()
@@ -29,6 +30,7 @@ export default function SmartPaymentTiming() {
       <PageHeader title="Smart Payment Timing" subtitle="Collect when you’re paid" backTo="/profile" />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
+        <GameStrip />
         <Card>
           <p className="label-text">Detected pay pattern</p>
           <p className="font-serif text-xl text-ink mt-1">

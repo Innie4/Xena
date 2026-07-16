@@ -8,6 +8,10 @@ import Modal, { SuccessModal } from '../components/Modal'
 import { useApp } from '../context/AppContext'
 import { formatNaira } from '../mockData'
 import { ContributorProfile } from '../services/prediction/types'
+import { useGame, BADGES } from '../game'
+import GameStrip from '../game/components/GameStrip'
+import BadgeShelf from '../game/components/BadgeShelf'
+import QuestTrail from '../game/components/QuestTrail'
 
 export default function Profile() {
   const {
@@ -20,6 +24,7 @@ export default function Profile() {
     toggleTiming,
     bills,
   } = useApp()
+  const game = useGame()
 
   const [cancelId, setCancelId] = useState<string | null>(null)
   const [cancelTiming, setCancelTiming] = useState(false)
@@ -46,6 +51,7 @@ export default function Profile() {
       <PageHeader title="Profile" subtitle="Your account & mandates" backTo="/app" showBell={false} />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
+        <GameStrip />
         <section className="space-y-4">
           <h2 className="font-serif text-lg text-ink">Account</h2>
 
@@ -90,6 +96,29 @@ export default function Profile() {
           </Card>
 
           <StandingCard profile={profile} />
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="font-serif text-lg text-ink">Street standing</h2>
+          <Card className="space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <p className="text-sm text-ink/60">
+                You are a <span className="font-semibold text-olive">{game.rank.label}</span> with a{' '}
+                {game.reliabilityScore}/100 reliability score.
+              </p>
+            </div>
+            <div>
+              <p className="label-text mb-2">Quests</p>
+              <QuestTrail quests={game.quests} />
+            </div>
+            <hr className="flame-rule" />
+            <div>
+              <p className="label-text mb-2">
+                Badges · {game.badges.length}/{BADGES.length}
+              </p>
+              <BadgeShelf badges={game.badges} all={BADGES} />
+            </div>
+          </Card>
         </section>
 
         <section className="space-y-4">

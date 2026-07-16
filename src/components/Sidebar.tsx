@@ -1,5 +1,10 @@
 import { NavLink, Link } from 'react-router-dom'
 import { useApp } from '../context/AppContext'
+import { useGame } from '../game'
+import RankPill from '../game/components/RankPill'
+import StreakFlame from '../game/components/StreakFlame'
+import SparkBar from '../game/components/SparkBar'
+import SparkPop from '../game/components/SparkPop'
 
 const items = [
   {
@@ -67,6 +72,7 @@ const items = [
 
 export default function Sidebar() {
   const { user, walletBalance, getStreetName, activeStreetId, notifications, openPropose } = useApp()
+  const game = useGame()
   const unread = notifications.filter((n) => !n.read).length
 
   return (
@@ -116,7 +122,23 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="p-3 border-t border-card/10">
+      <div className="p-3 border-t border-card/10 space-y-3">
+        <div className="rounded-card bg-card/10 px-3 py-3 relative">
+          <SparkPop sparks={game.sparks} />
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <RankPill rank={game.rank} light />
+            <StreakFlame streak={game.streak} />
+          </div>
+          <div className="mt-2">
+            <SparkBar
+              level={game.level}
+              nextLevel={game.nextLevel}
+              sparksIntoLevel={game.sparksIntoLevel}
+              sparksForLevel={game.sparksForLevel}
+              levelProgress={game.levelProgress}
+            />
+          </div>
+        </div>
         <div className="rounded-card bg-card/10 px-3 py-3">
           <p className="text-xs text-card/60">Wallet</p>
           <p className="num text-card mt-0.5">{`₦${walletBalance.toLocaleString('en-NG')}`}</p>

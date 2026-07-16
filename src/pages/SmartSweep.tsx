@@ -11,6 +11,7 @@ import StatusTag from '../components/StatusTag'
 import Modal, { SuccessModal } from '../components/Modal'
 import { useApp } from '../context/AppContext'
 import { formatNaira, formatDateTime } from '../mockData'
+import GameStrip from '../game/components/GameStrip'
 
 export default function SmartSweep() {
   const { billId } = useParams()
@@ -83,6 +84,8 @@ export default function SmartSweep() {
       <PageHeader title="Smart Sweep" subtitle={bill.type} backTo={`/bills/${billId}`} />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
+        <GameStrip />
+        <p className="text-sm text-ink/60 -mt-2">Small automatic sweeps keep your rhythm without you lifting a finger.</p>
         {/* Mandate summary: always visible per trust rules */}
         <Card className="bg-olive text-card border-0">
           <div className="flex items-center justify-between">

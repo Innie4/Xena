@@ -7,6 +7,7 @@ import { EmptyState } from '../components/states'
 import { useApp } from '../context/AppContext'
 import { formatNaira, formatDate } from '../mockData'
 import { useFakeLoad } from '../hooks/useFakeLoad'
+import GameStrip from '../game/components/GameStrip'
 
 export default function BillsDetail() {
   const { bills } = useApp()
@@ -22,6 +23,8 @@ export default function BillsDetail() {
       <PageHeader title="Bills" subtitle="Everything you owe, in one place" backTo="/app" />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
+        <GameStrip />
+        <p className="text-sm text-ink/60 -mt-2">Clear a bill and you earn sparks toward your next rank.</p>
         <ResolvedBanner />
 
         {loading ? (

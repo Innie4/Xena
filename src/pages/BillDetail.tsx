@@ -9,6 +9,7 @@ import { useApp } from '../context/AppContext'
 import { browserEngine, streetRankForScore } from '../services/prediction/engine'
 import { ContributorProfile } from '../services/prediction/types'
 import { formatNaira, formatDate } from '../mockData'
+import GameStrip from '../game/components/GameStrip'
 
 export default function BillDetail() {
   const { id } = useParams()
@@ -71,6 +72,7 @@ export default function BillDetail() {
       <PageHeader title={bill.type} subtitle={bill.provider} backTo="/bills" />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
+        <GameStrip />
         <Card>
           <div className="flex items-center justify-between">
             <span className="text-sm text-ink/60">Amount due</span>
