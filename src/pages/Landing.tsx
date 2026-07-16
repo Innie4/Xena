@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useMemo, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import {
   motion,
-  AnimatePresence,
   useInView,
   useReducedMotion,
   useMotionValue,
@@ -12,6 +11,8 @@ import {
   useTransform,
 } from 'framer-motion'
 import Button from '../components/Button'
+import FlameRing from '../components/FlameRing'
+import EmberBurst from '../components/EmberBurst'
 import { formatNaira } from '../mockData'
 
 /* ------------------------------------------------------------------ */
@@ -172,9 +173,6 @@ function CommunityWalletDemo() {
   const goal = 120000
   const [swept, setSwept] = useState(0)
   const total = Math.min(goal, base + swept)
-  const pct = total / goal
-  const r = 54
-  const circ = 2 * Math.PI * r
 
   return (
     <div className="relative">
@@ -210,34 +208,7 @@ function CommunityWalletDemo() {
         </div>
 
         <div className="flex items-center gap-5 mt-5">
-          <div className="relative h-32 w-32 shrink-0">
-            <svg viewBox="0 0 120 120" className="h-32 w-32 -rotate-90">
-              <circle cx="60" cy="60" r={r} fill="none" stroke="#E4DCCB" strokeWidth="10" />
-              <motion.circle
-                cx="60"
-                cy="60"
-                r={r}
-                fill="none"
-                stroke="url(#ringGrad)"
-                strokeWidth="10"
-                strokeLinecap="round"
-                strokeDasharray={circ}
-                initial={{ strokeDashoffset: circ }}
-                animate={{ strokeDashoffset: circ * (1 - pct) }}
-                transition={{ duration: 1.1, ease: 'easeOut' }}
-              />
-              <defs>
-                <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#C1552C" />
-                  <stop offset="100%" stopColor="#D9A441" />
-                </linearGradient>
-              </defs>
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="num text-2xl text-ink">{Math.round(pct * 100)}%</span>
-              <span className="text-[10px] text-ink/50">funded</span>
-            </div>
-          </div>
+          <FlameRing value={total} max={goal} centerLabel="funded" />
 
           <div className="flex-1">
             <p className="text-sm text-ink/70">Gutter clearing fund</p>
@@ -255,19 +226,7 @@ function CommunityWalletDemo() {
           Tap to drop a sweep into the wallet. Watch the work take shape.
         </p>
 
-        <AnimatePresence>
-          {swept > 0 && (
-            <motion.div
-              key={swept}
-              initial={{ opacity: 0, y: 8, scale: 0.8 }}
-              animate={{ opacity: 1, y: -4, scale: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute right-4 bottom-3 text-gold num text-sm"
-            >
-              +{formatNaira(500)}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {swept > 0 && <EmberBurst amount={500} triggerKey={swept} />}
       </div>
     </div>
   )

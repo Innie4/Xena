@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
 import Card from '../components/Card'
-import ProgressBar from '../components/ProgressBar'
+import FlameRing from '../components/FlameRing'
 import { EmptyState } from '../components/states'
 import { useApp } from '../context/AppContext'
 import { browserEngine, streetRankForScore } from '../services/prediction/engine'
@@ -90,12 +90,14 @@ export default function CommunityProjects() {
                     )}
                   </div>
                   <p className="font-medium text-ink mt-1">{p.title}</p>
-                  <div className="mt-3">
-                    <ProgressBar value={p.raised} max={p.goal} size="sm" />
-                  </div>
-                  <div className="flex justify-between mt-2 text-xs text-ink/60">
-                    <span className="num text-ink/80">{formatNaira(p.raised)} raised</span>
-                    <span>{formatNaira(p.goal - p.raised)} to go</span>
+                  <div className="mt-3 flex items-center gap-3">
+                    <FlameRing value={p.raised} max={p.goal} size={56} strokeWidth={6} showPercent />
+                    <div className="flex-1">
+                      <div className="flex justify-between text-xs text-ink/60">
+                        <span className="num text-ink/80">{formatNaira(p.raised)} raised</span>
+                        <span>{formatNaira(p.goal - p.raised)} to go</span>
+                      </div>
+                    </div>
                   </div>
                 </Card>
               </Link>

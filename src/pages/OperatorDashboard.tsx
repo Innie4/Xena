@@ -1,5 +1,6 @@
 import TopNav from '../components/TopNav'
 import Card from '../components/Card'
+import FlameRing from '../components/FlameRing'
 import ChartWrapper from '../components/ChartWrapper'
 import StatusTag from '../components/StatusTag'
 import FraudQueue from '../components/FraudQueue'
@@ -66,10 +67,15 @@ export default function OperatorDashboard() {
           </Card>
           <Card>
             <p className="label-text">Collected</p>
-            <p className="num-lg text-olive mt-1">{formatNaira(collected)}</p>
-            <p className="text-xs text-ink/50 mt-1">
-              {Math.round((collected / expectedAll) * 100)}% of target
-            </p>
+            <div className="mt-2 flex items-center gap-3">
+              <FlameRing value={collected} max={expectedAll} size={64} />
+              <div>
+                <p className="num text-olive">{formatNaira(collected)}</p>
+                <p className="text-xs text-ink/50 mt-0.5">
+                  {Math.round((collected / expectedAll) * 100)}% of target
+                </p>
+              </div>
+            </div>
           </Card>
           <Card>
             <p className="label-text">Streets paid</p>

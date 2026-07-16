@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
 import Card from '../components/Card'
-import ProgressBar from '../components/ProgressBar'
+import FlameRing from '../components/FlameRing'
 import StatusTag from '../components/StatusTag'
 import StandingCard from '../components/StandingCard'
 import { EmptyState } from '../components/states'
@@ -126,11 +126,11 @@ export default function ResidentDashboard() {
                     <p className="font-medium text-ink">{streetProject.title}</p>
                     <span className="text-xs text-ink/50">{streetProject.daysRemaining} days left</span>
                   </div>
-                  <p className="text-xs text-ink/55 mt-1">
-                    {formatNaira(streetProject.raised)} of {formatNaira(streetProject.goal)} raised
-                  </p>
-                  <div className="mt-3">
-                    <ProgressBar value={streetProject.raised} max={streetProject.goal} size="sm" />
+                  <div className="mt-3 flex items-center gap-3">
+                    <FlameRing value={streetProject.raised} max={streetProject.goal} size={56} strokeWidth={6} showPercent />
+                    <p className="text-xs text-ink/55">
+                      {formatNaira(streetProject.raised)} of {formatNaira(streetProject.goal)} raised
+                    </p>
                   </div>
                 </Card>
               </Link>

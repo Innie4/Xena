@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import PageHeader from '../components/PageHeader'
 import Card from '../components/Card'
 import Button from '../components/Button'
+import FlameRing from '../components/FlameRing'
+import EmberBurst from '../components/EmberBurst'
 import ToggleSwitch from '../components/ToggleSwitch'
 import StatusTag from '../components/StatusTag'
 import Modal, { SuccessModal } from '../components/Modal'
@@ -22,6 +24,8 @@ export default function SmartSweep() {
   const [flash, setFlash] = useState(false)
   const [cancelOpen, setCancelOpen] = useState(false)
   const [sweepCancelled, setSweepCancelled] = useState(false)
+  const [burstKey, setBurstKey] = useState(0)
+  const [burstAmount, setBurstAmount] = useState(0)
 
   useEffect(() => {
     if (!flash) return
@@ -63,6 +67,8 @@ export default function SmartSweep() {
     if (isPaused || remaining <= 0) return
     const amount = Math.min(mandate.cap, remaining)
     collectSweep(bill.id, amount)
+    setBurstAmount(amount)
+    setBurstKey((k) => k + 1)
     setFlash(true)
   }
 
@@ -103,7 +109,7 @@ export default function SmartSweep() {
         </Card>
 
         {/* Visual container that fills up */}
-        <Card>
+        <Card className="relative">
           <div className="flex items-end justify-between mb-3">
             <div>
               <p className="text-xs text-ink/55">Collected so far</p>
@@ -123,15 +129,10 @@ export default function SmartSweep() {
             </div>
           </div>
 
-          <div className="h-5 w-full bg-warmgray rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-terracotta to-gold rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${pct}%` }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
-            />
+          <div className="flex justify-center my-2">
+            <FlameRing value={collected} max={bill.amount} size={96} showPercent centerLabel="collected" />
           </div>
-          <p className="text-xs text-ink/50 mt-2 text-center">
+          <p className="text-xs text-ink/50 mt-1 text-center">
             {Math.round(pct)}% of {formatNaira(bill.amount)} collected through sweeps
           </p>
 
@@ -148,6 +149,7 @@ export default function SmartSweep() {
               This bill is fully covered. Well done.
             </p>
           )}
+          {burstAmount > 0 && <EmberBurst amount={burstAmount} triggerKey={burstKey} />}
         </Card>
 
         {/* Running log */}

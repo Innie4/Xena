@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import PageHeader from '../components/PageHeader'
 import Card from '../components/Card'
 import Button from '../components/Button'
-import ProgressBar from '../components/ProgressBar'
+import FlameRing from '../components/FlameRing'
+import EmberBurst from '../components/EmberBurst'
 import Input from '../components/Input'
 import Modal, { SuccessModal } from '../components/Modal'
 import ToggleSwitch from '../components/ToggleSwitch'
@@ -21,6 +22,7 @@ export default function CommunityProjectDetail() {
   const [open, setOpen] = useState(false)
   const [success, setSuccess] = useState(false)
   const [contributed, setContributed] = useState(0)
+  const [burstKey, setBurstKey] = useState(0)
 
   if (!project) {
     return (
@@ -43,6 +45,7 @@ export default function CommunityProjectDetail() {
       anonymous,
     })
     setContributed(amountNum)
+    setBurstKey((k) => k + 1)
     setOpen(false)
     setSuccess(true)
     setAmount('')
@@ -53,9 +56,9 @@ export default function CommunityProjectDetail() {
       <PageHeader title="Community Wallet" subtitle={project.category} backTo="/community" />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
-        <Card>
-          <div className="flex items-start justify-between gap-2">
-            <h2 className="font-serif text-xl text-ink leading-snug">{project.title}</h2>
+      <Card className="relative">
+        <div className="flex items-start justify-between gap-2">
+          <h2 className="font-serif text-xl text-ink leading-snug">{project.title}</h2>
             <AnimatePresence>
               {isFunded && (
                 <motion.div
@@ -83,15 +86,15 @@ export default function CommunityProjectDetail() {
           </div>
           <p className="text-sm text-ink/70 mt-2">{project.description}</p>
 
-          <div className="mt-4">
-            <ProgressBar value={project.raised} max={project.goal} color={isFunded ? 'gold' : 'olive'} />
-          </div>
-          <div className="flex justify-between mt-2">
-            <span className="num text-olive">{formatNaira(project.raised)}</span>
-            <span className="text-sm text-ink/60">
-              of {formatNaira(project.goal)}
-              {project.daysRemaining > 0 && ` · ${project.daysRemaining} days left`}
-            </span>
+          <div className="mt-4 flex items-center gap-5">
+            <FlameRing value={project.raised} max={project.goal} centerLabel="funded" />
+            <div className="flex-1">
+              <p className="num text-lg text-olive">{formatNaira(project.raised)}</p>
+              <p className="text-xs text-ink/50">
+                of {formatNaira(project.goal)}
+                {project.daysRemaining > 0 && ` · ${project.daysRemaining} days left`}
+              </p>
+            </div>
           </div>
 
           {isFunded && project.worker && (
@@ -107,6 +110,7 @@ export default function CommunityProjectDetail() {
               )}
             </div>
           )}
+          {success && <EmberBurst amount={contributed} triggerKey={burstKey} />}
         </Card>
 
         {!isFunded && (
