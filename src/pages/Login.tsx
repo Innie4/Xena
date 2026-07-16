@@ -122,6 +122,7 @@ export default function Login() {
   const [phone, setPhone] = useState('')
   const [otp, setOtp] = useState('')
   const [entering, setEntering] = useState(false)
+  const enteredRef = useRef(false)
 
   const phoneDigits = phone.replace(/\D/g, '')
   const phoneOk = phoneDigits.length >= 10 && phoneDigits.length <= 11
@@ -134,7 +135,14 @@ export default function Login() {
     }
   }, [otpOk, step])
 
+  useEffect(() => {
+    if (step === 2) enter()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step])
+
   const enter = () => {
+    if (enteredRef.current) return
+    enteredRef.current = true
     setEntering(true)
     login(currentUser)
     setTimeout(() => navigate('/app'), 400)
