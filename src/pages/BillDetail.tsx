@@ -6,6 +6,7 @@ import Button from '../components/Button'
 import StatusTag from '../components/StatusTag'
 import Modal, { SuccessModal } from '../components/Modal'
 import { useApp } from '../context/AppContext'
+import { useContribution } from '../contributions'
 import { browserEngine, streetRankForScore } from '../services/prediction/engine'
 import { ContributorProfile } from '../services/prediction/types'
 import { formatNaira, formatDate } from '../mockData'
@@ -15,6 +16,7 @@ export default function BillDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { bills, payBill, setBillSmartSweep, walletBalance, user, activeStreetId } = useApp()
+  const { requestContribution } = useContribution()
   const bill = bills.find((b) => b.id === id)
 
   const profile: ContributorProfile = {
@@ -31,7 +33,6 @@ export default function BillDetail() {
   const reliability = browserEngine.scoreReliability(profile)
   const rank = streetRankForScore(reliability.score)
 
-  const [confirmOpen, setConfirmOpen] = useState(false)
   const [success, setSuccess] = useState(false)
   const [sweepOpen, setSweepOpen] = useState(false)
   const [sweepSuccess, setSweepSuccess] = useState(false)
@@ -56,9 +57,18 @@ export default function BillDetail() {
   ]
 
   const doPay = () => {
-    payBill(bill.id)
-    setConfirmOpen(false)
-    setSuccess(true)
+    requestContribution({
+      amount: bill.amount,
+      purpose: bill.type,
+      destination: bill.provider,
+      fee: FEE,
+      balanceAfter: walletBalance - bill.amount,
+    })
+      .then(() => {
+        payBill(bill.id)
+        setSuccess(true)
+      })
+      .catch(() => {})
   }
 
   const toggleSweep = () => {
@@ -149,7 +159,7 @@ export default function BillDetail() {
 
         {bill.status !== 'paid' && (
           <div className="space-y-3">
-            <Button fullWidth size="lg" onClick={() => setConfirmOpen(true)}>
+            <Button fullWidth size="lg" onClick={doPay}>
               Pay {formatNaira(bill.amount)}
             </Button>
             {!bill.smartSweepActive ? (
@@ -169,42 +179,6 @@ export default function BillDetail() {
           </div>
         )}
       </div>
-
-      <Modal
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        title={`Pay ${formatNaira(bill.amount)}?`}
-        footer={
-          <>
-            <Button variant="ghost" size="sm" onClick={() => setConfirmOpen(false)}>
-              Cancel
-            </Button>
-            <Button size="sm" onClick={doPay} disabled={walletBalance < bill.amount}>
-              Confirm & pay
-            </Button>
-          </>
-        }
-      >
-        <p className="text-sm text-ink/70 mb-3">Here’s exactly what you’ll be charged:</p>
-        <div className="bg-sand rounded-btn p-3 text-sm space-y-1">
-          <div className="flex justify-between">
-            <span className="text-ink/70">Bill amount</span>
-            <span className="num">{formatNaira(bill.amount - FEE)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-ink/70">Processing fee</span>
-            <span className="num text-brick">{formatNaira(FEE)}</span>
-          </div>
-          <div className="border-t border-warmgray my-1" />
-          <div className="flex justify-between font-medium">
-            <span>Total from wallet</span>
-            <span className="num text-terracotta">{formatNaira(bill.amount)}</span>
-          </div>
-        </div>
-        <p className="text-xs text-ink/50 mt-2">
-          Your wallet balance after this: {formatNaira(Math.max(0, walletBalance - bill.amount))}
-        </p>
-      </Modal>
 
       <Modal
         open={sweepOpen}

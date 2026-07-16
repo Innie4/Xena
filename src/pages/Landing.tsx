@@ -14,6 +14,7 @@ import Button from '../components/Button'
 import FlameRing from '../components/FlameRing'
 import EmberBurst from '../components/EmberBurst'
 import { formatNaira } from '../mockData'
+import { useContribution } from '../contributions'
 
 /* ------------------------------------------------------------------ */
 /* Small helpers                                                       */
@@ -172,6 +173,7 @@ function CommunityWalletDemo() {
   const base = 108000
   const goal = 120000
   const [swept, setSwept] = useState(0)
+  const { requestContribution } = useContribution()
   const total = Math.min(goal, base + swept)
 
   return (
@@ -218,7 +220,19 @@ function CommunityWalletDemo() {
         </div>
 
         <div className="mt-4 flex items-center gap-2">
-          <Button size="sm" fullWidth onClick={() => setSwept((s) => Math.min(goal - base, s + 500))}>
+          <Button
+            size="sm"
+            fullWidth
+            onClick={() =>
+              requestContribution({
+                amount: 500,
+                purpose: 'Community Wallet',
+                destination: 'Abak Road',
+              })
+                .then(() => setSwept((s) => Math.min(goal - base, s + 500)))
+                .catch(() => {})
+            }
+          >
             Add your sweep · ₦500
           </Button>
         </div>

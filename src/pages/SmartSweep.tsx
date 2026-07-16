@@ -10,13 +10,15 @@ import ToggleSwitch from '../components/ToggleSwitch'
 import StatusTag from '../components/StatusTag'
 import Modal, { SuccessModal } from '../components/Modal'
 import { useApp } from '../context/AppContext'
+import { useContribution } from '../contributions'
 import { formatNaira, formatDateTime } from '../mockData'
 import GameStrip from '../game/components/GameStrip'
 
 export default function SmartSweep() {
   const { billId } = useParams()
   const navigate = useNavigate()
-  const { bills, sweepMandates, sweepLog, collectSweep, setMandatePaused, cancelMandate } = useApp()
+  const { bills, sweepMandates, sweepLog, collectSweep, setMandatePaused, cancelMandate, walletBalance } = useApp()
+  const { requestContribution } = useContribution()
 
   const bill = bills.find((b) => b.id === billId)
   const mandate = sweepMandates.find((m) => m.billId === billId)
@@ -67,10 +69,19 @@ export default function SmartSweep() {
   const doCollect = () => {
     if (isPaused || remaining <= 0) return
     const amount = Math.min(mandate.cap, remaining)
-    collectSweep(bill.id, amount)
-    setBurstAmount(amount)
-    setBurstKey((k) => k + 1)
-    setFlash(true)
+    requestContribution({
+      amount,
+      purpose: bill.type,
+      destination: 'Smart Sweep',
+      balanceAfter: walletBalance - amount,
+    })
+      .then(() => {
+        collectSweep(bill.id, amount)
+        setBurstAmount(amount)
+        setBurstKey((k) => k + 1)
+        setFlash(true)
+      })
+      .catch(() => {})
   }
 
   const doCancel = () => {

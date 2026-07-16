@@ -10,12 +10,14 @@ import Input from '../components/Input'
 import Modal, { SuccessModal } from '../components/Modal'
 import ToggleSwitch from '../components/ToggleSwitch'
 import { useApp } from '../context/AppContext'
+import { useContribution } from '../contributions'
 import { formatNaira, formatDate, Contributor } from '../mockData'
 import GameStrip from '../game/components/GameStrip'
 
 export default function CommunityProjectDetail() {
   const { id } = useParams()
-  const { projects, user, contribute } = useApp()
+  const { projects, user, contribute, walletBalance } = useApp()
+  const { requestContribution } = useContribution()
   const project = projects.find((p) => p.id === id)
 
   const [amount, setAmount] = useState('')
@@ -40,16 +42,25 @@ export default function CommunityProjectDetail() {
 
   const doContribute = () => {
     if (!valid || !user) return
-    contribute(project.id, amountNum, {
-      name: user.firstName,
+    requestContribution({
       amount: amountNum,
-      anonymous,
+      purpose: project.title,
+      destination: 'Community Wallet',
+      balanceAfter: walletBalance - amountNum,
     })
-    setContributed(amountNum)
-    setBurstKey((k) => k + 1)
-    setOpen(false)
-    setSuccess(true)
-    setAmount('')
+      .then(() => {
+        contribute(project.id, amountNum, {
+          name: user.firstName,
+          amount: amountNum,
+          anonymous,
+        })
+        setContributed(amountNum)
+        setBurstKey((k) => k + 1)
+        setOpen(false)
+        setSuccess(true)
+        setAmount('')
+      })
+      .catch(() => {})
   }
 
   return (
