@@ -27,4 +27,28 @@ pnpm-debug.log*
 
 # Coverage
 coverage
-backend/venv
+
+
+
+
+
+# =====================================================
+# Backend Configurations
+
+# =======================================================
+# Backend Configurations
+# =======================================================
+backend/.env
+backend/venv/
+backend/.venv/
+.venv/
+venv/
+env/
+.env*
+
+# Python Cache
+**/__pycache__/
+**/*.pyc
+.pytest_cache/
+
+
