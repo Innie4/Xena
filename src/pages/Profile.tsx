@@ -46,40 +46,54 @@ export default function Profile() {
       <PageHeader title="Profile" subtitle="Your account & mandates" backTo="/app" showBell={false} />
 
       <div className="mx-auto w-full max-w-md lg:max-w-6xl lg:px-8 lg:py-7 px-5 py-5 space-y-4">
-        <Card>
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-terracotta text-card flex items-center justify-center font-serif text-lg font-semibold">
-              {user?.firstName?.[0] ?? 'X'}
-            </div>
-            <div>
-              <p className="font-medium text-ink">{user?.name}</p>
-              <p className="text-xs text-ink/55">{user?.phone}</p>
-              <p className="text-xs text-ink/55">{getStreetName(activeStreetId)}</p>
-            </div>
-          </div>
-        </Card>
+        <section className="space-y-4">
+          <h2 className="font-serif text-lg text-ink">Account</h2>
 
-        <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="label-text">Linked bank</p>
-              <p className="font-medium text-ink mt-0.5">{user?.bankName}</p>
-              <p className="text-xs text-ink/55">{user?.accountName}</p>
-            </div>
-            <span className="inline-flex items-center gap-1 text-xs text-olive font-medium bg-olive/10 px-2.5 py-1 rounded-full">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+          <Card className="relative">
+            <Link
+              to="/profile/edit"
+              aria-label="Edit profile"
+              className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full text-ink/55 hover:bg-warmgray/60 hover:text-ink transition-colors"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 20h9" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              Connected
-            </span>
-          </div>
-          <p className="text-[11px] text-ink/45 mt-2">Secured via Open Banking · read-only access</p>
-        </Card>
+            </Link>
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-full bg-terracotta text-card flex items-center justify-center font-serif text-lg font-semibold">
+                {user?.firstName?.[0] ?? 'X'}
+              </div>
+              <div>
+                <p className="font-medium text-ink">{user?.name}</p>
+                <p className="text-xs text-ink/55">{user?.phone}</p>
+                <p className="text-xs text-ink/55">{getStreetName(activeStreetId)}</p>
+              </div>
+            </div>
+          </Card>
 
-        <StandingCard profile={profile} />
+          <Card>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="label-text">Linked bank</p>
+                <p className="font-medium text-ink mt-0.5">{user?.bankName}</p>
+                <p className="text-xs text-ink/55">{user?.accountName}</p>
+              </div>
+              <span className="inline-flex items-center gap-1 text-xs text-olive font-medium bg-olive/10 px-2.5 py-1 rounded-full">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Connected
+              </span>
+            </div>
+            <p className="text-[11px] text-ink/45 mt-2">Secured via Open Banking · read-only access</p>
+          </Card>
 
-        <section>
-          <h2 className="font-serif text-lg text-ink mb-2">Your mandates</h2>
+          <StandingCard profile={profile} />
+        </section>
+
+        <section className="space-y-4">
+          <h2 className="font-serif text-lg text-ink">Mandates</h2>
 
           {activeMandates.length === 0 && !timing.enabled && (
             <Card className="text-sm text-ink/55">

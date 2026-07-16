@@ -13,6 +13,7 @@ import CommunityProjectDetail from './pages/CommunityProjectDetail'
 import Voting from './pages/Voting'
 import Notifications from './pages/Notifications'
 import Profile from './pages/Profile'
+import EditProfile from './pages/EditProfile'
 import OperatorDashboard from './pages/OperatorDashboard'
 import AdminDashboard from './pages/AdminDashboard'
 
@@ -57,6 +58,7 @@ export default function App() {
         <Route path="/vote" element={<Voting />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/edit" element={<EditProfile />} />
       </Route>
 
       <Route element={<OperatorLayout />}>

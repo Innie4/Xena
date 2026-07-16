@@ -60,6 +60,7 @@ interface AppContextValue extends AppState {
   rejectWorker: (id: string) => void
   pushNotification: (n: Omit<AppNotification, 'id' | 'read'>) => void
   markAllRead: () => void
+  updateUser: (patch: Partial<User>) => void
   getStreetName: (id: string) => string
 }
 
@@ -280,6 +281,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const getStreetName = useCallback((id: string) => STREET_NAMES[id] ?? id, [])
 
+  const updateUser = useCallback((patch: Partial<User>) => {
+    setState((s) => (s.user ? { ...s, user: { ...s.user, ...patch } } : s))
+  }, [])
+
   const value: AppContextValue = {
     ...state,
     login,
@@ -297,6 +302,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     rejectWorker,
     pushNotification,
     markAllRead,
+    updateUser,
     getStreetName,
   }
 
