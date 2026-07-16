@@ -1,14 +1,59 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import Button from '../components/Button'
 import Input from '../components/Input'
 import Card from '../components/Card'
 import { LoadingState } from '../components/states'
-import { streets, lookupBVN, partnerBanks, LinkedAccount, User } from '../mockData'
+import { partnerBanks, User } from '../mockData'
 import { useApp } from '../context/AppContext'
 
+const API = import.meta.env.VITE_API_BASE_URL as string
+
 const MILESTONES = ['BVN', 'Bank', 'Verify', 'Home']
+
+// ---------------------------------------------------------------------------
+// API types
+// ---------------------------------------------------------------------------
+
+interface ApiBankAccount {
+  bank_name: string
+  account_number: string
+  account_name: string
+  provider: string
+}
+
+interface BvnLookupResponse {
+  phone_number: string
+  accounts: ApiBankAccount[]
+}
+
+interface EstateResult {
+  id: string
+  name: string
+  city: string
+}
+
+// Internal shape used by Step 2 render (mirrors original mockData.LinkedAccount)
+interface LinkedAccount {
+  bank: string          // maps from bank_name
+  accountNumber: string // maps from account_number
+  accountName: string   // maps from account_name
+  provider: string
+}
+
+function adaptAccount(a: ApiBankAccount): LinkedAccount {
+  return {
+    bank: a.bank_name,
+    accountNumber: a.account_number,
+    accountName: a.account_name,
+    provider: a.provider,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Small shared components (unchanged)
+// ---------------------------------------------------------------------------
 
 function CheckBadge({ size = 18 }: { size?: number }) {
   return (
@@ -130,6 +175,29 @@ function OtpInput({ value, onChange }: { value: string; onChange: (v: string) =>
   )
 }
 
+// ---------------------------------------------------------------------------
+// Inline spinner (used on loading states without disrupting layout)
+// ---------------------------------------------------------------------------
+
+function Spinner() {
+  return (
+    <svg
+      className="animate-spin h-4 w-4 inline-block"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+    >
+      <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
+      <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
+
 export default function SignupFlow() {
   const navigate = useNavigate()
   const { login } = useApp()
@@ -138,28 +206,41 @@ export default function SignupFlow() {
   // Step 1: BVN
   const [bvn, setBvn] = useState('')
   const [looking, setLooking] = useState(false)
-  const [lookup, setLookup] = useState<ReturnType<typeof lookupBVN> | null>(null)
+  const [bvnError, setBvnError] = useState<string | null>(null)
 
-  // Step 2: bank
+  // Data returned by BVN lookup (real API shape)
+  const [bvnPhone, setBvnPhone] = useState<string>('')
+  const [apiAccounts, setApiAccounts] = useState<ApiBankAccount[]>([])
+
+  // Step 2: bank (internal shape mirrors original mockData.LinkedAccount)
   const [selected, setSelected] = useState<LinkedAccount | null>(null)
 
   // Step 3: OTP
   const [otp, setOtp] = useState('')
 
-  // Step 4: street
+  // Step 4: estate search
   const [mode, setMode] = useState<'choose' | 'locate' | 'type'>('choose')
   const [locating, setLocating] = useState(false)
-  const [suggested, setSuggested] = useState<{ id: string; name: string; city: string } | null>(null)
+  const [suggested, setSuggested] = useState<EstateResult | null>(null)
   const [query, setQuery] = useState('')
-  const [streetId, setStreetId] = useState('st-abak')
-  const [, setCustomName] = useState('')
+  const [estates, setEstates] = useState<EstateResult[]>([])
+  const [estatesLoading, setEstatesLoading] = useState(false)
+  const [selectedEstateId, setSelectedEstateId] = useState<string>('')
+  const [locateError, setLocateError] = useState<string | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // Final submit
   const [finalizing, setFinalizing] = useState(false)
   const [done, setDone] = useState(false)
+  const [finishError, setFinishError] = useState<string | null>(null)
 
   const bvnDigits = bvn.replace(/\D/g, '')
   const bvnOk = bvnDigits.length === 11
   const otpOk = otp.replace(/\D/g, '').length === 6
+
+  // Derived from API accounts (adapted to internal shape)
+  const linkedAccounts: LinkedAccount[] = apiAccounts.map(adaptAccount)
+  const accountCount = linkedAccounts.length
 
   // auto-advance OTP when complete
   useEffect(() => {
@@ -169,60 +250,190 @@ export default function SignupFlow() {
     }
   }, [otpOk, step])
 
-  const runLookup = () => {
+  // ---------------------------------------------------------------------------
+  // Step 1 — BVN lookup (real API)
+  // ---------------------------------------------------------------------------
+
+  const runLookup = async () => {
     if (!bvnOk) return
     setLooking(true)
-    setTimeout(() => {
-      setLookup(lookupBVN(bvnDigits))
-      setLooking(false)
+    setBvnError(null)
+
+    try {
+      const res = await fetch(`${API}/users/bvn-lookup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bvn: bvnDigits }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: 'BVN lookup failed.' }))
+        console.error('[bvn-lookup] error body:', err)
+        setBvnError(err.detail ?? 'Could not reach the server. Try again.')
+        return
+      }
+
+      const data: BvnLookupResponse = await res.json()
+      setBvnPhone(data.phone_number)
+      setApiAccounts(data.accounts)
       setStep(1)
-    }, 900)
+    } catch (e) {
+      console.error('[bvn-lookup] network error:', e)
+      setBvnError('Network error — is the backend running?')
+    } finally {
+      setLooking(false)
+    }
   }
+
+  // ---------------------------------------------------------------------------
+  // Step 4 — estate search with 300 ms debounce (real API)
+  // ---------------------------------------------------------------------------
+
+  const fetchEstates = useCallback(async (q: string) => {
+    setEstatesLoading(true)
+    try {
+      const params = new URLSearchParams({ q })
+      const res = await fetch(`${API}/estates/search?${params}`)
+      if (!res.ok) {
+        console.error('[estates/search] error:', await res.text())
+        setEstates([])
+        return
+      }
+      const data: { estates: EstateResult[] } = await res.json()
+      setEstates(data.estates)
+    } catch (e) {
+      console.error('[estates/search] network error:', e)
+      setEstates([])
+    } finally {
+      setEstatesLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (mode !== 'type') return
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => fetchEstates(query), 300)
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  }, [query, mode, fetchEstates])
+
+  // Pre-load estates when entering 'type' mode (shows recent estates immediately)
+  useEffect(() => {
+    if (mode === 'type') fetchEstates('')
+  }, [mode, fetchEstates])
+
+  // ---------------------------------------------------------------------------
+  // Step 4 — "Use my location" (mock detect, pre-fills first API result)
+  // ---------------------------------------------------------------------------
 
   const detectLocation = () => {
     setMode('locate')
     setLocating(true)
-    const finish = (id: string) => {
-      const s = streets.find((x) => x.id === id)!
-      setSuggested({ id: s.id, name: s.name, city: s.city })
-      setStreetId(s.id)
+    setLocateError(null)
+
+    const resolveEstate = (estate: EstateResult) => {
+      setSuggested(estate)
+      setSelectedEstateId(estate.id)
       setLocating(false)
     }
-    if (typeof navigator !== 'undefined' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        () => finish('st-abak'),
-        () => finish('st-abak'),
-        { timeout: 4000 },
-      )
-    } else {
-      setTimeout(() => finish('st-abak'), 900)
+
+    const failLocation = (msg: string) => {
+      setLocateError(msg)
+      setLocating(false)
+    }
+
+    // Fetch estates from API, then simulate geolocation match
+    fetch(`${API}/estates/search?q=`)
+      .then((r) => {
+        if (!r.ok) throw new Error('estates fetch failed')
+        return r.json()
+      })
+      .then((data: { estates: EstateResult[] }) => {
+        const first = data.estates[0]
+        if (!first) {
+          failLocation('No estates found in the system. Please type your street name instead.')
+          return
+        }
+        if (typeof navigator !== 'undefined' && navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            () => resolveEstate(first),
+            () => resolveEstate(first),
+            { timeout: 4000 },
+          )
+        } else {
+          setTimeout(() => resolveEstate(first), 900)
+        }
+      })
+      .catch(() => {
+        failLocation('Could not reach the server to detect your location. Please type your street instead.')
+      })
+  }
+
+  // ---------------------------------------------------------------------------
+  // Final submit — POST /users (real API)
+  // ---------------------------------------------------------------------------
+
+  const finish = async (overrideEstateId?: string) => {
+    const estateId = overrideEstateId ?? selectedEstateId
+    if (!estateId || !selected) return
+
+    setFinalizing(true)
+    setFinishError(null)
+
+    const payload = {
+      phone_number: bvnPhone,
+      full_name: selected.accountName,
+      estate_id: estateId,
+      selected_account: {
+        bank_name: selected.bank,
+        account_number: selected.accountNumber,
+        account_name: selected.accountName,
+        provider: selected.provider,
+      },
+    }
+
+    try {
+      const res = await fetch(`${API}/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: 'Something went wrong.' }))
+        console.error('[POST /users] error body:', err)
+        setFinishError(err.detail ?? 'Could not create your account. Please try again.')
+        return
+      }
+
+      const data = await res.json()
+      const u = data.user
+
+      const firstName = (u.full_name ?? 'Neighbour').split(' ')[0]
+      const newUser: User = {
+        id: u.id,
+        name: u.full_name,
+        firstName,
+        phone: u.phone_number,
+        streetId: u.estate_id,
+        bankConnected: true,
+        bankName: selected.bank,
+        accountName: selected.accountName,
+      }
+      login(newUser)
+      setDone(true)
+    } catch (e) {
+      console.error('[POST /users] network error:', e)
+      setFinishError('Network error — is the backend running?')
+    } finally {
+      setFinalizing(false)
     }
   }
 
-  const filtered = streets.filter((s) =>
-    (s.name + ' ' + s.city + ' ' + s.lga).toLowerCase().includes(query.toLowerCase().trim()),
+  const matchFound = estates.some(
+    (s) => s.name.toLowerCase() === query.trim().toLowerCase(),
   )
-  const matchFound = filtered.some((s) => s.name.toLowerCase() === query.trim().toLowerCase())
-
-  const finish = () => {
-    setFinalizing(true)
-    setTimeout(() => {
-      const firstName = (selected?.accountName ?? 'Neighbour').split(' ')[0]
-      const newUser: User = {
-        id: 'u-' + bvnDigits.slice(-6),
-        name: selected?.accountName ?? firstName,
-        firstName,
-        phone: lookup?.phone ?? '+234 803 555 0142',
-        streetId,
-        bankConnected: true,
-        bankName: selected?.bank ?? partnerBanks[0],
-        accountName: selected?.accountName ?? firstName,
-      }
-      login(newUser)
-      setFinalizing(false)
-      setDone(true)
-    }, 1100)
-  }
 
   const progressPct = (step / (MILESTONES.length - 1)) * 100
 
@@ -259,7 +470,7 @@ export default function SignupFlow() {
             exit={{ opacity: 0, x: -16 }}
             transition={{ duration: 0.25 }}
           >
-            {/* STEP 1: BVN */}
+            {/* ── STEP 1: BVN ──────────────────────────────────────────── */}
             {step === 0 && (
               <div>
                 <span className="inline-block text-xs font-medium uppercase tracking-wider text-terracotta">
@@ -293,6 +504,10 @@ export default function SignupFlow() {
                   />
                 </div>
 
+                {bvnError && (
+                  <p className="mt-3 text-sm text-red-500">{bvnError}</p>
+                )}
+
                 <Button
                   className="mt-6"
                   fullWidth
@@ -300,7 +515,13 @@ export default function SignupFlow() {
                   disabled={!bvnOk || looking}
                   onClick={runLookup}
                 >
-                  {looking ? 'Finding your banks…' : 'Find my accounts'}
+                  {looking ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Spinner /> Finding your banks…
+                    </span>
+                  ) : (
+                    'Find my accounts'
+                  )}
                 </Button>
 
                 <div className="mt-4 flex items-center gap-2 bg-olive/5 border border-olive/20 rounded-btn px-3 py-2.5">
@@ -315,15 +536,15 @@ export default function SignupFlow() {
               </div>
             )}
 
-            {/* STEP 2: linked accounts */}
-            {step === 1 && lookup && (
+            {/* ── STEP 2: linked accounts ───────────────────────────────── */}
+            {step === 1 && linkedAccounts.length > 0 && (
               <div>
                 <motion.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   className="inline-flex items-center gap-2 bg-gold/15 text-[#8a6516] text-xs font-medium px-3 py-1.5 rounded-full"
                 >
-                  <CheckBadge size={14} /> Found {lookup.accounts.length} accounts on this BVN
+                  <CheckBadge size={14} /> Found {accountCount} accounts on this BVN
                 </motion.div>
                 <h1 className="font-serif text-2xl sm:text-3xl text-ink mt-3">
                   Pick the account to link.
@@ -333,7 +554,7 @@ export default function SignupFlow() {
                 </p>
 
                 <div className="mt-5 space-y-2.5">
-                  {lookup.accounts.map((acc) => {
+                  {linkedAccounts.map((acc) => {
                     const on = selected?.accountNumber === acc.accountNumber
                     return (
                       <button
@@ -412,13 +633,13 @@ export default function SignupFlow() {
               </div>
             )}
 
-            {/* STEP 3: OTP */}
-            {step === 2 && lookup && (
+            {/* ── STEP 3: OTP ───────────────────────────────────────────── */}
+            {step === 2 && (
               <div>
                 <h1 className="font-serif text-2xl sm:text-3xl text-ink">One quick check.</h1>
                 <p className="text-ink/65 mt-2 text-sm">
                   We sent a 6-digit code to{' '}
-                  <span className="num text-ink">{lookup.phone}</span>, the number on your BVN. Any
+                  <span className="num text-ink">{bvnPhone}</span>, the number on your BVN. Any
                   6 digits work for this demo.
                 </p>
 
@@ -445,12 +666,12 @@ export default function SignupFlow() {
               </div>
             )}
 
-            {/* STEP 4: street */}
+            {/* ── STEP 4: estate / home ─────────────────────────────────── */}
             {step === 3 && (
               <div>
-                <h1 className="font-serif text-2xl sm:text-3xl text-ink">Where’s home?</h1>
+                <h1 className="font-serif text-2xl sm:text-3xl text-ink">Where's home?</h1>
                 <p className="text-ink/65 mt-2 text-sm">
-                  We’ll drop you into your street’s Community Wallet.
+                  We'll drop you into your street's Community Wallet.
                 </p>
 
                 {mode === 'choose' && (
@@ -495,20 +716,40 @@ export default function SignupFlow() {
                   <div className="mt-6">
                     {locating ? (
                       <LoadingState label="Finding your street…" />
+                    ) : locateError ? (
+                      <div className="space-y-3">
+                        <p className="text-sm text-red-500">{locateError}</p>
+                        <div className="flex gap-2">
+                          <Button variant="secondary" size="sm" onClick={() => { setMode('choose'); setLocateError(null) }}>
+                            Back
+                          </Button>
+                          <Button size="sm" fullWidth onClick={() => { setLocateError(null); setMode('type') }}>
+                            Type my street
+                          </Button>
+                        </div>
+                      </div>
                     ) : (
                       suggested && (
                         <Card>
-                          <p className="label-text">We think you’re near</p>
+                          <p className="label-text">We think you're near</p>
                           <p className="font-serif text-xl text-ink mt-1">{suggested.name}</p>
                           <p className="text-sm text-ink/55">{suggested.city}</p>
                           <div className="flex gap-2 mt-4">
                             <Button variant="secondary" size="sm" onClick={() => { setMode('choose'); setSuggested(null) }}>
                               Not me
                             </Button>
-                            <Button size="sm" fullWidth onClick={finish}>
-                              That’s home
+                            <Button
+                              size="sm"
+                              fullWidth
+                              disabled={finalizing}
+                              onClick={() => finish(suggested.id)}
+                            >
+                              {finalizing ? <span className="flex items-center gap-2"><Spinner /> Saving…</span> : "That's home"}
                             </Button>
                           </div>
+                          {finishError && (
+                            <p className="mt-3 text-sm text-red-500">{finishError}</p>
+                          )}
                         </Card>
                       )
                     )}
@@ -533,33 +774,40 @@ export default function SignupFlow() {
                       }
                     />
                     <div className="space-y-2 max-h-72 overflow-auto">
-                      {filtered.map((s) => (
+                      {estatesLoading && (
+                        <div className="flex items-center gap-2 px-1 text-xs text-ink/45">
+                          <Spinner /> Searching…
+                        </div>
+                      )}
+                      {!estatesLoading && estates.map((s) => (
                         <button
                           key={s.id}
-                          onClick={() => { setStreetId(s.id); setCustomName(''); finish() }}
+                          onClick={() => {
+                            setSelectedEstateId(s.id)
+                            finish(s.id)
+                          }}
                           className="w-full text-left rounded-btn border border-warmgray bg-card px-4 py-3 hover:border-terracotta/40"
                         >
                           <span className="font-medium text-ink">{s.name}</span>
                           <span className="text-ink/45 text-sm"> · {s.city}</span>
                         </button>
                       ))}
-                      {query.trim() && !matchFound && (
-                        <button
-                          onClick={() => {
-                            setStreetId('st-abak')
-                            setCustomName(query.trim())
-                            finish()
-                          }}
-                          className="w-full text-left rounded-btn border border-dashed border-terracotta/50 bg-terracotta/5 px-4 py-3"
-                        >
-                          <span className="font-medium text-terracotta">Add “{query.trim()}”</span>
-                          <span className="text-ink/55 text-sm"> · we’ll set up its wallet</span>
-                        </button>
+                      {!estatesLoading && query.trim() && !matchFound && (
+                        <p className="text-sm text-ink/55 px-1 py-2">
+                          No match for <span className="font-medium text-ink">"{query.trim()}"</span>.
+                          Only existing estates can be selected — try a different search term.
+                        </p>
                       )}
-                      {!query && (
+                      {!estatesLoading && !query && estates.length === 0 && (
                         <p className="text-xs text-ink/45 px-1">Start typing to find your street.</p>
                       )}
+                      {!estatesLoading && !query && estates.length > 0 && (
+                        <p className="text-xs text-ink/45 px-1">Recent estates — or start typing to search.</p>
+                      )}
                     </div>
+                    {finishError && (
+                      <p className="mt-1 text-sm text-red-500">{finishError}</p>
+                    )}
                     <button className="text-sm text-ink/55 hover:text-terracotta" onClick={() => setMode('choose')}>
                       ← Back to options
                     </button>
@@ -571,7 +819,7 @@ export default function SignupFlow() {
         </AnimatePresence>
       </div>
 
-      {/* SUCCESS */}
+      {/* ── SUCCESS overlay ───────────────────────────────────────────────── */}
       <AnimatePresence>
         {done && (
           <motion.div
@@ -593,7 +841,7 @@ export default function SignupFlow() {
               >
                 <CheckBadge size={42} />
               </motion.div>
-              <h1 className="font-serif text-3xl text-ink mt-5">You’re in, {selected?.accountName.split(' ')[0]}!</h1>
+              <h1 className="font-serif text-3xl text-ink mt-5">You're in, {selected?.accountName.split(' ')[0]}!</h1>
               <p className="text-ink/65 mt-2">
                 Your {selected?.bank} account is linked and your street wallet is ready. Time to watch
                 the work get done.
