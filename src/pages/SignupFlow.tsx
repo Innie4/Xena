@@ -483,15 +483,6 @@ export default function SignupFlow() {
                   </Link>
                 </p>
 
-                <div className="mt-4 flex items-center gap-2 bg-olive/5 border border-olive/20 rounded-btn px-3 py-2.5">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3F4B2B" strokeWidth="1.8">
-                    <rect x="3" y="11" width="18" height="10" rx="2" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                  </svg>
-                  <span className="text-xs text-olive font-medium">
-                    Your number is only used to reach you. No bank needed to start.
-                  </span>
-                </div>
               </div>
             )}
 
