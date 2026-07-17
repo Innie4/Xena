@@ -2,6 +2,15 @@
 
 Xena helps neighbours on a street collect money together for the things they share, like trash pickup, gutter clearing, and waste packing. One person no longer has to chase others in a WhatsApp group.
 
+## Team
+
+**Project name:** Xena
+
+Built by:
+- Inimfon Udoh
+- Mene Gideon
+- Imeobong Monday
+
 ## The problem
 
 On many streets, collecting contributions is slow and stressful. Someone sends messages asking who has paid, people forget, and the work stops because the money is missing. There is no clear view of who has given, how much is in the pot, or when the next job will happen. Trust drops, and the street falls behind on basic upkeep.
